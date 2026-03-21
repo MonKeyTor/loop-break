@@ -198,3 +198,9 @@ ablegen und Pages unter *Settings → Pages* aktivieren.
 | δ | Abstand Drahtmitte → Rohrwand |
 | εᵣ | Relative Dielektrizitätszahl |
 | pF | Picofarad (10⁻¹² Farad) |
+
+## Version
+
+- **Aktuelle Version:** 7.0.0
+- **Release-Datum:** 21. März 2026
+- **APK:** `loop-break-7.0.0.apk`
