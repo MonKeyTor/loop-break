@@ -1,6 +1,6 @@
 # loop break · Meldeader-Kapazität
 
-Webanwendung zur Berechnung von Leitungslängen überwachter Fernwärmeleitungen
+Web- und Appanwendung zur Berechnung von Leitungslängen überwachter Fernwärmeleitungen
 anhand von Kapazitätsmessungen an der Meldeader.
 
 ---
