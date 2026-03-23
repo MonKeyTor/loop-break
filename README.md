@@ -71,7 +71,7 @@ Vorteil: einheitliche Verdrahtung durch alle Hersteller, sehr genaue Ortung (±0
 **KA-Tab – Ausführungskabel**
 
 Dient zur Berechnung des Kapazitäts-Offsets für das Ausführungskabel
-(8-adrig, Cu, DIN 47001). Aderquerschnitt (1,0 oder 1,5 mm²), Kabellänge
+(8-adrig, Cu, DIN 47001). Aderquerschnitt (0,5 oder 1,0 oder 1,5 mm²), Kabellänge
 und Aderposition (Benachbart / Übernächst / Gegenüber) eingeben →
 errechneter Offset wird mit **„KA-Wert in Merk2"** direkt in Merk2 übertragen.
 
@@ -82,6 +82,7 @@ C/L = π · ε₀ · εᵣ / arcosh(D / d)
 ```
 
 - **d** = Aderdurchmesser, berechnet aus Querschnitt: d = √(4·A / π)
+  - 0,5 mm² → d = 0,8 mm
   - 1,0 mm² → d = 1,128 mm
   - 1,5 mm² → d = 1,382 mm
 - **D** = Abstand der Adermittelpunkte (mm)
@@ -201,6 +202,6 @@ ablegen und Pages unter *Settings → Pages* aktivieren.
 
 ## Version
 
-- **Aktuelle Version:** 7.0.0
+- **Aktuelle Version:** 1.0.0
 - **Release-Datum:** 21. März 2026
 - **APK:** `loop-break-7.0.0.apk`
