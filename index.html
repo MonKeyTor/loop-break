@@ -167,7 +167,7 @@
 <body>
 <div class="app">
   <div class="hdr">
-    <div><h1>Meldeader-Kapazität</h1><p>Exzentrische Kapazitätsformel · EN 14419</p></div>
+    <div><h1>Meldeader-Kapazität</h1><p>Exzentrische Kapazitätsformel · EN 14419</p><p style="margin-bottom:-6px"><a href="https://github.com/MonkeyTor/loop-break" target="_blank" style="font-size:11px;color:var(--color-text-tertiary);text-decoration:none">github.com/MonkeyTor/loop-break</a></p></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <button class="gear" onclick="openS()">⚙ Einstellungen</button>
       <span style="font-size:10px;color:var(--color-text-tertiary);font-family:monospace" id="eps-badge">εᵣ 1.20</span>
@@ -244,39 +244,39 @@
         </div>
       <div id="ka-panel" style="display:none">
         <div style="display:flex;gap:8px;align-items:flex-start">
-          <!-- Left: heading + querschnitt + länge + offset -->
+          <!-- Left: heading + Länge + offset -->
           <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px">8-adriges Ausführungskabel (Cu)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-              <div class="f">
-                <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Aderquerschnitt</label>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-                  <button class="damm-btn on" id="ka-cs-0" onclick="setKaCs(0)">1,0 mm²</button>
-                  <button class="damm-btn"    id="ka-cs-1" onclick="setKaCs(1)">1,5 mm²</button>
-                </div>
-              </div>
-              <div class="f">
-                <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px;text-align:center">Länge Kabel</label>
-                <div style="display:flex;align-items:center;gap:5px">
-                  <input type="number" id="ka-len" placeholder="m" step="0.5" min="0" inputmode="decimal"
-                    style="width:100%;padding-top:4px;padding-bottom:4px" oninput="let v=this.value;if(v.replace(/[^0-9]/g,'').length>2)this.value=v.slice(0,-1);calcKaOffset()">
-                  <span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap">m</span>
-                </div>
+            <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px">8-adriges Ausführungskabel</div>
+            <div style="margin-bottom:6px">
+              <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Länge Kabel (Cu)</label>
+              <div style="display:flex;align-items:center;gap:4px">
+                <input type="number" id="ka-len" placeholder="m" step="0.5" min="0" value="5" inputmode="decimal"
+                  style="width:7ch;padding-top:4px;padding-bottom:4px;font-size:16px;font-weight:600;border-radius:var(--radius-md);border:0.5px solid var(--color-border-md)" oninput="let v=this.value;if(v.replace(/[^0-9]/g,'').length>2)this.value=v.slice(0,-1);calcKaOffset()">
+                <span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap">m</span>
               </div>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--color-bg-secondary);border-radius:var(--radius-md)">
+            <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 8px;background:var(--color-bg-secondary);border-radius:var(--radius-md);width:fit-content">
               <span style="font-size:11px;color:var(--color-text-secondary)">Offset</span>
-              <span style="font-size:14px;font-weight:600;font-family:monospace;color:var(--color-text)" id="ka-offset-pf">—</span>
+              <span style="font-size:14px;font-weight:600;font-family:monospace;color:var(--color-text);min-width:2.5ch;text-align:right" id="ka-offset-pf">—</span>
               <span style="font-size:11px;color:var(--color-text-secondary)">pF</span>
-              <span style="font-size:9px;color:var(--color-text-tertiary);margin-left:2px" id="ka-offset-detail"></span>
+              <span style="font-size:11px;color:var(--color-text-secondary)" id="ka-offset-detail"></span>
             </div>
           </div>
-          <!-- Right: Aderposition -->
+          <!-- Center: Aderquerschnitt – same size/style as Aderposition, directly beside it -->
           <div style="flex:0 0 auto">
-            <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Aderposition</label>
+            <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px;text-align:center">Aderquerschnitt</label>
             <div style="display:grid;grid-template-columns:1fr;gap:3px">
-              <button class="damm-btn on" id="ka-pos-0" onclick="setKaPos(0)" data-d="2.9" style="padding:5px 10px;font-size:11px">Benachbart</button>
-              <button class="damm-btn"    id="ka-pos-1" onclick="setKaPos(1)" data-d="5.4" style="padding:5px 10px;font-size:11px">Übernächst</button>
+              <button class="damm-btn on" id="ka-cs-0" onclick="setKaCs(0)" style="padding:5px 10px;font-size:11px">0,5 mm²</button>
+              <button class="damm-btn"    id="ka-cs-1" onclick="setKaCs(1)" style="padding:5px 10px;font-size:11px">1,0 mm²</button>
+              <button class="damm-btn"    id="ka-cs-2" onclick="setKaCs(2)" style="padding:5px 10px;font-size:11px">1,5 mm²</button>
+            </div>
+          </div>
+          <!-- Right: Aderposition – unchanged -->
+          <div style="flex:0 0 auto">
+            <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px;text-align:center">Aderposition</label>
+            <div style="display:grid;grid-template-columns:1fr;gap:3px">
+              <button class="damm-btn"    id="ka-pos-0" onclick="setKaPos(0)" data-d="2.9" style="padding:5px 10px;font-size:11px">Benachbart</button>
+              <button class="damm-btn on" id="ka-pos-1" onclick="setKaPos(1)" data-d="5.4" style="padding:5px 10px;font-size:11px">Übernächst</button>
               <button class="damm-btn"    id="ka-pos-2" onclick="setKaPos(2)" data-d="7.5" style="padding:5px 10px;font-size:11px">Gegenüber</button>
             </div>
           </div>
@@ -861,18 +861,25 @@ function updateMemo2ResultBox(C_per_m, unit){
   document.getElementById('memo2-result-unit').textContent = parts[1]||'m';
 }
 // ── KA Offset Calculation ─────────────────────────────────────────────────
-const KA_D_POSITIONS = [2.9, 5.4, 7.5]; // mm center-to-center for adjacent, skip-one, opposite
+// Center-to-center distances for Cu/SMPE 4x2x0.8mm (8 non-twisted wires in circle)
+// Shield inner D=7.5mm, wire centre radius ~2.85mm
+// Benachbart (45°): 2.18mm  Übernächst (90°): 4.03mm  Gegenüber (180°): 5.7mm
+const KA_D_POSITIONS = [2.18, 4.03, 5.7];
 // Solid Cu wire diameters: d = sqrt(4*A/π)
 const KA_CS = [
+  {label:'0,5 mm²', A:0.5, d: 0.800},  // Cu/SMPE 4x2x0.8mm: nominal d=0.800mm
   {label:'1,0 mm²', A:1.0, d: Math.sqrt(4*1.0/Math.PI)},  // 1.128 mm
   {label:'1,5 mm²', A:1.5, d: Math.sqrt(4*1.5/Math.PI)},  // 1.382 mm
 ];
-let kaPos = 0;
+// Screened twisted pair constants for Cu/SMPE/VAS/FOL/AL+PE 4x2x0.8mm
+const KA_SHIELD_D = 7.5;   // shield inner diameter mm (11.5 - 2*1.75 - 2*0.25)
+const KA_EPS_R   = 2.3;    // SMPE/XLPE insulation
+let kaPos = 1;
 let kaCs  = 0;
 
 function setKaCs(idx){
   kaCs = idx; save('ka-cs', idx);
-  [0,1].forEach(i => document.getElementById('ka-cs-'+i).classList.toggle('on', i===idx));
+  [0,1,2].forEach(i => document.getElementById('ka-cs-'+i).classList.toggle('on', i===idx));
   calcKaOffset();
 }
 function setKaPos(idx){
@@ -881,20 +888,18 @@ function setKaPos(idx){
   calcKaOffset();
 }
 
+// Measured KA cable constants (Cu/SMPE 4x2x0.8mm, netto after eichwert)
+// Measured on 5m sample, eichwert 10pF already subtracted
+const KA_C_PER_M = [43.0, 40.5, 38.0]; // pF/m: Benachbart, Übernächst, Gegenüber (gemessen)
+
 function calcKaOffset(){
   const len = parseFloat(document.getElementById('ka-len').value);
   if(!len || len<=0){ document.getElementById('ka-offset-pf').textContent='—'; document.getElementById('ka-offset-detail').textContent=''; return; }
-  const d_mm = KA_CS[kaCs].d;
-  const D_mm = KA_D_POSITIONS[kaPos];
-  const epsR = 3.5; // PVC insulation
-  const arg = D_mm / d_mm;
-  if(arg <= 1){ document.getElementById('ka-offset-pf').textContent='Fehler'; return; }
-  const ac = Math.log(arg + Math.sqrt(arg*arg - 1)); // arcosh
-  const C_per_m = Math.PI * 8.854e-12 * epsR / ac;
-  const C_total_pF = C_per_m * len * 1e12;
-  document.getElementById('ka-offset-pf').textContent = C_total_pF.toFixed(1);
-  document.getElementById('ka-offset-detail').textContent =
-    '(' + (C_per_m*1e12).toFixed(1) + ' pF/m · ' + len + ' m · D=' + D_mm + 'mm)';
+  const C_per_m_pF = KA_C_PER_M[kaPos];
+  const C_total_pF = C_per_m_pF * len;
+  const offVal = Math.round(C_total_pF);
+  document.getElementById('ka-offset-pf').textContent = offVal;
+  document.getElementById('ka-offset-detail').textContent = '– ' + C_per_m_pF.toFixed(1) + ' pF/m';
   save('ka-len', len);
 }
 
@@ -957,10 +962,12 @@ document.getElementById('smod').addEventListener('click',function(e){if(e.target
   document.getElementById('sys-ka').classList.toggle('on',      savedSys==='ka');
   document.getElementById('ka-panel').style.display = savedSys==='ka' ? 'block':'none';
   kaCs  = parseInt(load('ka-cs','0'));
-  [0,1].forEach(i => document.getElementById('ka-cs-'+i).classList.toggle('on', i===kaCs));
-  kaPos = parseInt(load('ka-pos','0'));
+  [0,1,2].forEach(i => document.getElementById('ka-cs-'+i).classList.toggle('on', i===kaCs));
+  kaPos = parseInt(load('ka-pos','1'));
   [0,1,2].forEach(i => document.getElementById('ka-pos-'+i).classList.toggle('on', i===kaPos));
   // ka-len intentionally left empty on startup
+  // Set default ka-len if empty
+  if(!document.getElementById('ka-len').value) document.getElementById('ka-len').value='5';
   if(savedSys==='ka') calcKaOffset();
   document.getElementById('wires-nordic').style.display  = savedSys==='nordic'  ?'block':'none';
   document.getElementById('wires-brandes').style.display = savedSys==='brandes' ?'block':'none';
