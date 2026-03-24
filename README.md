@@ -201,6 +201,6 @@ ablegen und Pages unter *Settings → Pages* aktivieren.
 
 ## Version
 
-- **Aktuelle Version:** 7.0.0
+- **Aktuelle Version:** 1.0.1
 - **Release-Datum:** 21. März 2026
 - **APK:** `loop-break-7.0.0.apk`
