@@ -2,1015 +2,1051 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ffffff">
-  <title>loop break</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#1B3D5E">
+  <title>Messbrücke · Nässe-Ortung</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    :root {
-      --color-bg:            #ffffff;
-      --color-bg-secondary:  #f5f5f4;
-      --color-bg-tertiary:   #e7e5e4;
-      --color-text:          #1c1917;
-      --color-text-secondary:#57534e;
-      --color-text-tertiary: #a8a29e;
-      --color-border:        rgba(0,0,0,0.12);
-      --color-border-md:     rgba(0,0,0,0.22);
-      --radius-md:           8px;
-      --radius-lg:           12px;
-      --accent:              #1d4ed8;
-      --accent-bg:           #dbeafe;
-      --accent-text:         #1e3a8a;
-      --safe-top: 12px;
-      --safe-bottom: 12px;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --color-bg:            #1c1917;
-        --color-bg-secondary:  #292524;
-        --color-bg-tertiary:   #44403c;
-        --color-text:          #fafaf9;
-        --color-text-secondary:#d6d3d1;
-        --color-text-tertiary: #78716c;
-        --color-border:        rgba(255,255,255,0.12);
-        --color-border-md:     rgba(255,255,255,0.22);
-        --accent-bg:           #1e3a8a;
-        --accent-text:         #bfdbfe;
-      }
-    }
+    :root{--bg:#F2F4F7;--card:#fff;--navy:#1B3D5E;--navy2:#2D6291;--red:#C0392B;--red-bg:#FDEDEC;
+          --blue-t:#1A6FA8;--amber:#B7770D;--amber-bg:#FEF9E7;--green:#1A7A4A;--green-bg:#EAFAF1;
+          --border:#D8DCE5;--text:#1C2B3A;--text2:#5A6880;--radius:11px;}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;background:var(--color-bg-secondary)}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:var(--color-text)}
-    .app{max-width:480px;margin:0 auto;padding:var(--safe-top) .75rem calc(var(--safe-bottom) + .5rem)}
-    .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-    .hdr h1{font-size:17px;font-weight:600;color:var(--color-text)}
-    .hdr p{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
-    .gear{background:none;border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 11px;cursor:pointer;color:var(--color-text-secondary);font-size:13px}
-    .card{background:var(--color-bg);border:0.5px solid var(--color-border);border-radius:var(--radius-lg);padding:.85rem 1rem;margin-bottom:8px}
-    .ctitle{font-size:11px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-    .f{margin-bottom:8px}
-    .f label{display:block;font-size:12px;color:var(--color-text-secondary);margin-bottom:3px}
-    .f input,.f select{width:100%;border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:9px 10px;font-size:15px;background:var(--color-bg);color:var(--color-text);-webkit-appearance:none;appearance:none}
-    .f input:focus,.f select:focus{outline:none;border-color:var(--accent)}
-    .hint{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-    .btn{width:100%;padding:12px;background:var(--color-bg);border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);font-size:15px;font-weight:600;cursor:pointer;color:var(--color-text)}
-    .btn:active{opacity:.8}
-    .btn-calc{background:var(--accent-bg) !important;border-color:var(--accent) !important;color:var(--accent-text) !important}
-    .btn-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;margin-bottom:0}
-    .btn-memo{padding:12px 14px;background:#fee2e2;border:0.5px solid #ef4444;border-radius:var(--radius-md);font-size:15px;font-weight:600;cursor:pointer;color:#991b1b;white-space:nowrap}
-    .btn-memo:active{opacity:.8}
-    .memo-field-wrap{position:relative}
-    .memo-field-wrap input{padding-right:34px}
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-    input[type=number]{-moz-appearance:textfield}
-    .memo-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:20px;color:#a8a29e;padding:0;line-height:1;font-weight:300}
-    .memo-clear:hover{color:#ef4444}
-    input.memo-active{border-color:#ef4444 !important;background:#fee2e2 !important;color:#991b1b !important}
-    .warn{font-size:12px;color:#dc2626;margin-top:6px;display:none}
-    .fbox{font-size:11px;color:var(--color-text-tertiary);font-family:monospace;padding:.5rem .75rem;background:var(--color-bg-secondary);border-radius:var(--radius-md);line-height:1.7}
-    .divider{border:none;border-top:0.5px solid var(--color-border);margin:10px 0}
-    /* Modal */
-    .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:100}
-    .modal-ov.open{display:flex}
-    .modal{background:var(--color-bg);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:1.25rem 1rem calc(var(--safe-bottom) + 1.25rem);width:100%;max-height:90vh;overflow-y:auto}
-    .mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-    .mhdr h2{font-size:16px;font-weight:600;color:var(--color-text)}
-    .xbtn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);padding:0 4px}
-    .slabel{font-size:11px;font-weight:600;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px}
-    .reset-link{font-size:12px;color:var(--color-text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline}
-    /* Pipe mode tab */
-    .pipe-mode-tab{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:8px;border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);overflow:hidden}
-    .pmode-btn{padding:8px;font-size:12px;font-weight:600;background:var(--color-bg);border:none;cursor:pointer;color:var(--color-text-secondary)}
-    .pmode-btn.on{background:var(--accent-bg);color:var(--accent-text)}
-    .pmode-btn:first-child{border-right:0.5px solid var(--color-border-md)}
-    .pipe-result-row{display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--color-bg-secondary);border-radius:var(--radius-md);font-size:12px;color:var(--color-text-secondary);margin-top:6px}
-    .pipe-result-val{font-weight:600;color:var(--color-text);font-family:monospace}
-    /* System tab */
-    .sys-tab{display:grid;grid-template-columns:42.5fr 42.5fr 15fr;gap:0;margin-bottom:8px;border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);overflow:hidden}
-    .sys-btn{padding:9px;font-size:13px;font-weight:600;background:var(--color-bg);border:none;cursor:pointer;color:var(--color-text-secondary)}
-    .sys-btn.on{background:var(--accent-bg);color:var(--accent-text)}
-    .sys-btn:not(:last-child){border-right:0.5px solid var(--color-border-md)}
-    /* Wire cards */
-    .wire-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:6px}
-    .wire-card{padding:9px 10px;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;background:var(--color-bg);transition:border-color .15s,background .15s}
-    .wire-name{font-size:13px;font-weight:600;margin-bottom:2px;color:var(--color-text)}
-    .wire-spec{font-size:11px;line-height:1.4;font-family:monospace;color:var(--color-text-secondary)}
-    .wire-tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;margin-bottom:4px}
-    .wire-card.cu-blank.on{border-color:#BA7517;background:#FAEEDA}
-    .wire-card.cu-blank.on .wire-name{color:#412402}
-    .wire-card.cu-blank.on .wire-spec{color:#854F0B}
-    .tag-cu-blank{background:#FAEEDA;color:#633806}
-    .wire-card.cu-tin.on{border-color:#185FA5;background:#E6F1FB}
-    .wire-card.cu-tin.on .wire-name{color:#042C53}
-    .wire-card.cu-tin.on .wire-spec{color:#0C447C}
-    .tag-cu-tin{background:#E6F1FB;color:#042C53}
-    .wire-card.nicr.on{border-color:#A32D2D;background:#FCEBEB}
-    .wire-card.nicr.on .wire-name{color:#501313}
-    .wire-card.nicr.on .wire-spec{color:#791F1F}
-    .tag-nicr{background:#FCEBEB;color:#791F1F}
-    .wire-card.curet.on{border-color:#0F6E56;background:#E1F5EE}
-    .wire-card.curet.on .wire-name{color:#04342C}
-    .wire-card.curet.on .wire-spec{color:#085041}
-    .tag-ret{background:#E1F5EE;color:#085041}
-    .wire-card.ka-wire.on{border-color:#9B1C1C;background:#FDF2F2}
-    .wire-card.ka-wire.on .wire-name{color:#450A0A}
-    .wire-card.ka-wire.on .wire-spec{color:#7F1D1D}
-    .tag-ka{background:#FDF2F2;color:#7F1D1D}
-    /* Delta section */
-    .delta-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-    .delta-numunit{display:flex;align-items:baseline;gap:5px;min-width:62px}
-    .delta-num{font-size:28px;font-weight:600;font-family:monospace;color:var(--color-text)}
-    .delta-unit{font-size:13px;color:var(--color-text-secondary)}
-    /* Damm-stärke selector row */
-    .damm-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
-    .damm-btn{padding:5px 2px;border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);font-size:10px;font-weight:600;background:var(--color-bg);cursor:pointer;text-align:center;color:var(--color-text-secondary);line-height:1.3}
-    .damm-btn.on{border-color:var(--accent);background:var(--accent-bg);color:var(--accent-text)}
-    .damm-btn.disabled{opacity:.3;cursor:default}
-    /* Damm option cards – 4 in a row */
-    .damm-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
-    .damm-card{padding:6px 4px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;background:var(--color-bg);text-align:center;transition:border-color .15s,background .15s;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .damm-card.on{border-color:var(--accent);background:var(--accent-bg)}
-    .damm-card.on .dc-label{color:var(--accent-text)}
-    .damm-card.on .dc-val{color:var(--accent-text)}
-    .damm-card.on .dc-kmr{color:var(--accent-text)}
-    .dc-label{font-size:9px;color:var(--color-text-tertiary);margin-bottom:1px}
-    .dc-val{font-size:12px;font-weight:600;font-family:monospace;color:var(--color-text)}
-    .dc-kmr{font-size:9px;color:var(--color-text-secondary);margin-top:1px}
-    /* Slider */
-    input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--accent-bg);outline:none;cursor:pointer;flex:1}
-    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:pointer;margin-top:-9px}
-    input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:pointer}
-    input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--accent-bg)}
-    /* Result */
-    .res{border-radius:var(--radius-lg);padding:.85rem 1rem;margin-top:4px;margin-bottom:8px;background:#FEFCE8;border:2px solid #CA8A04}
-    .rlabel{font-size:11px;font-weight:600;color:#854D0E;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
-    .rval{font-size:38px;font-weight:600;line-height:1.1;color:#1C1917}
-    .runit{font-size:19px;color:#CA8A04;font-weight:400}
-    .ralt{font-size:12px;color:#A16207;margin-top:1px;font-family:monospace}
-    .rdetail{font-size:11px;color:var(--color-text-tertiary);font-family:monospace;padding:.5rem .75rem;background:var(--color-bg-secondary);border-radius:var(--radius-md);line-height:1.7;white-space:pre-wrap;margin-bottom:8px}
-    .res-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-    .res-main{flex:1;min-width:0}
-    .memo-result{flex-shrink:0;min-width:80px;padding:6px 8px;border-radius:var(--radius-md);background:#FEFCE8;border:1.5px solid #CA8A04;text-align:center;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
-    .memo-result.memo-on{background:#fee2e2;border-color:#ef4444}
-    .memo-result-label{font-size:9px;font-weight:600;color:#854D0E;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
-    .memo-result.memo-on .memo-result-label{color:#991b1b}
-    .memo-result-val{font-size:18px;font-weight:600;color:#1C1917;line-height:1.1}
-    .memo-result.memo-on .memo-result-val{color:#7f1d1d}
-    .memo-result-unit{font-size:11px;color:#CA8A04;font-weight:400}
-    .memo-result.memo-on .memo-result-unit{color:#ef4444}
-    /* Pipe info row */
-    .pipe-info{font-size:11px;color:var(--color-text-tertiary);padding:4px 0 0;font-family:monospace}
+    html,body{min-height:100%;background:var(--bg);color:var(--text)}
+    body{font-family:'Helvetica Neue',Arial,-apple-system,sans-serif;font-size:15px;line-height:1.5}
+    .app{max-width:520px;margin:0 auto;padding:14px 10px 60px}
+
+    .hdr{display:flex;align-items:center;gap:12px;background:var(--navy);border-radius:var(--radius);
+         padding:14px 16px;margin-bottom:10px;color:#fff}
+    .hdr-icon{font-size:26px;line-height:1}
+    .hdr h1{font-size:15px;font-weight:700;letter-spacing:.02em}
+    .hdr p{font-size:11px;opacity:.55;margin-top:1px}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+    .card-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;
+              cursor:pointer;user-select:none;-webkit-user-select:none}
+    .card-hdr:active{background:var(--bg)}
+    .card-htitle{display:flex;align-items:center;gap:9px}
+    .card-icon{font-size:15px}
+    .card-htitle h2{font-size:13.5px;font-weight:600;color:var(--navy)}
+    .badge{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--bg);color:var(--text2);font-weight:500}
+    .toggle-arr{font-size:11px;color:var(--text2);transition:transform .2s}
+    .toggle-arr.open{transform:rotate(180deg)}
+    .card-body{padding:0 15px 15px;border-top:1px solid var(--border);display:none}
+    .card-body.open{display:block}
+
+    .field{margin-top:13px}
+    .field label{display:block;font-size:11px;font-weight:600;color:var(--text2);
+                 text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+    .fld{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;
+         font-size:15px;color:var(--text);background:#fff;font-family:inherit;outline:none;transition:border-color .15s}
+    .fld:focus{border-color:var(--navy2)}
+    .fld-row{display:flex;gap:8px;align-items:center}
+    .fld-unit{font-size:13px;color:var(--text2);white-space:nowrap}
+    .beta-tag{font-size:9px;padding:1px 5px;background:#FEF3C7;color:#92400E;border-radius:3px;
+              font-weight:700;text-transform:uppercase;margin-left:5px;vertical-align:middle}
+
+    .info-row{display:flex;justify-content:space-between;align-items:center;
+              padding:8px 11px;background:var(--bg);border-radius:7px;margin-top:9px}
+    .info-row .lbl{font-size:12px;color:var(--text2)}
+    .info-row .val{font-size:13.5px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+
+    .rges-box{margin-top:9px;background:#EAF4FB;border:1.5px solid #7FB3D3;border-radius:8px;padding:10px 13px}
+    .rges-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1A5276;margin-bottom:7px}
+    .rges-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .rges-row .rl{font-size:12px;color:var(--text2)}
+    .rges-row .rv{font-size:13px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+    .rges-row .rv.manual{color:var(--red)}
+    .rges-diff{font-size:11px;margin-top:5px;padding:4px 8px;border-radius:5px;text-align:center;display:none}
+    .rges-diff.ok{background:var(--green-bg);color:var(--green)}
+    .rges-diff.warn{background:var(--amber-bg);color:var(--amber)}
+
+    .aux-list{margin-top:10px}
+    .aux-row{display:grid;grid-template-columns:1fr 95px auto;gap:7px;align-items:center;margin-bottom:7px}
+    .aux-row .fld{font-size:14px;padding:9px 10px}
+    .btn-rm{background:none;border:none;cursor:pointer;color:#B0BBC9;font-size:17px;padding:4px 5px;line-height:1}
+    .btn-rm:hover{color:var(--red)}
+    .btn-add{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;
+             background:var(--bg);border:1.5px dashed var(--border);border-radius:7px;cursor:pointer;
+             font-size:13px;color:var(--navy2);font-weight:500;width:100%;margin-top:4px;font-family:inherit}
+    .btn-add:hover{background:#E8EDF5;border-color:var(--navy2)}
+    .btn-add:disabled{opacity:.35;cursor:not-allowed}
+
+    .seg-btn{display:flex;align-items:center;gap:7px;padding:9px 12px;background:var(--bg);
+             border:1.5px solid var(--border);border-radius:7px;cursor:pointer;font-size:13px;
+             color:var(--navy2);font-weight:500;width:100%;margin-top:10px;font-family:inherit}
+    .seg-panel{display:none;margin-top:9px;background:var(--bg);border-radius:7px;padding:11px}
+    .seg-panel.open{display:block}
+    .seg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;max-height:240px;overflow-y:auto;margin-bottom:8px}
+    .seg-inp{padding:7px 3px;border:1px solid var(--border);border-radius:5px;font-size:13px;
+             text-align:center;background:#fff;width:100%;font-family:inherit;outline:none}
+    .seg-inp:focus{border-color:var(--navy2)}
+    .seg-useBtn{width:100%;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:6px;
+                cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;margin-top:4px}
+
+    .ka-cols{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+    .ka-col{background:var(--bg);border-radius:8px;padding:10px}
+    .ka-col h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+    .ka-col.ka-a h3{color:var(--red)} .ka-col.ka-b h3{color:var(--blue-t)}
+    .ka-fld{width:100%;padding:8px 9px;border:1.5px solid var(--border);border-radius:6px;
+            font-size:13px;background:#fff;font-family:inherit;outline:none;margin-bottom:5px}
+    .ka-fld:focus{border-color:var(--navy2)}
+    .ka-r{font-size:12px;color:var(--text2);margin-top:4px}
+    .ka-r b{color:var(--text);font-variant-numeric:tabular-nums}
+
+    .side-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+              color:var(--text2);margin-top:16px;padding-bottom:5px;border-bottom:2px solid var(--border);margin-bottom:2px}
+    .term-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+    .term-field label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+                      text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:5px}
+    .tdot{width:11px;height:11px;border-radius:50%;display:inline-block;flex-shrink:0}
+    .tdot.r{background:var(--red)} .tdot.b{background:var(--blue-t)}
+    .term-inp{width:100%;padding:12px;border:2px solid var(--border);border-radius:7px;font-size:20px;
+              font-weight:500;text-align:center;color:var(--text);background:#fff;font-family:inherit;
+              outline:none;transition:border-color .15s}
+    .term-field.tf-r .term-inp:focus{border-color:var(--red)}
+    .term-field.tf-b .term-inp:focus{border-color:var(--blue-t)}
+    .sum-chk{font-size:12px;text-align:center;margin-top:7px;padding:5px;border-radius:6px;min-height:20px}
+    .sum-chk.ok{background:var(--green-bg);color:var(--green)}
+    .sum-chk.wn{background:var(--amber-bg);color:var(--amber)}
+    .sum-chk.er{background:var(--red-bg);color:var(--red)}
+
+    /* Chain */
+    .chain-display{display:flex;flex-direction:column;gap:6px;margin:8px 0 5px}
+    .chain-row{display:flex;flex-wrap:wrap;align-items:center;gap:3px}
+    .ms-lbl{font-size:9px;font-weight:700;letter-spacing:.05em;color:var(--text2);
+            text-transform:uppercase;min-width:42px;flex-shrink:0}
+    .ch-node{padding:3px 7px;border-radius:4px;font-size:9.5px;font-weight:600;
+             white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+    .ch-ka  {background:#F2F4F7;color:#3D5166;border:1px solid #C5CDD8}
+    .ch-fw  {background:#EAF4FB;color:#1A5276;border:1px solid #7FB3D3}
+    .ch-hfl {background:#E8F8F5;color:#1A6645;border:1px solid #7DCEA0}
+    .ch-mklr{background:#FDEDEC;color:#A93226;border:1px solid #F1948A}
+    .ch-mklb{background:#EAF4FB;color:#1565A3;border:1px solid #7FB3D3}
+    .ch-nass{background:#1B3D5E;color:#fff;border:1px solid #2D6291;padding:2px 6px}
+    .ch-arrow{font-size:9px;color:#A0AEC0}
+
+    /* Results */
+    .results{background:var(--navy);border-radius:var(--radius);padding:15px;margin-bottom:8px}
+    .res-title{font-size:11px;font-weight:700;text-transform:uppercase;
+               letter-spacing:.08em;color:rgba(255,255,255,.45);margin-bottom:13px}
+    .no-res{text-align:center;color:rgba(255,255,255,.35);font-size:13px;padding:18px 0}
+    .res-tabs{display:flex;gap:6px;margin-bottom:12px}
+    .res-tab{flex:1;padding:6px;border-radius:7px;border:1.5px solid rgba(255,255,255,.15);
+             background:rgba(255,255,255,.05);color:rgba(255,255,255,.45);font-size:11px;
+             font-weight:600;text-align:center;cursor:pointer;font-family:inherit;
+             text-transform:uppercase;letter-spacing:.04em}
+    .res-tab.active{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4);color:#fff}
+    .res-pane{display:none} .res-pane.active{display:block}
+
+    .ruler{position:relative;height:60px;margin-bottom:14px;padding:0 2px}
+    .ruler-track{position:absolute;top:30px;left:0;right:0;height:4px;background:rgba(255,255,255,.18);border-radius:2px}
+    .ruler-lbl{position:absolute;top:38px;font-size:10px;color:rgba(255,255,255,.4)}
+    .ruler-lbl.la{left:0} .ruler-lbl.lb{right:0}
+    .r-mark{position:absolute;transform:translateX(-50%);border-radius:2px;transition:left .3s ease}
+    .r-mark.m1,.r-mark.m2,.r-mark.m3,.r-mark.m4{top:21px;width:4px;height:18px}
+    .r-mark.m-mean{top:18px;width:6px;height:24px;background:#fff;border-radius:3px}
+    .ruler-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .rl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.5)}
+    .rl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+    .pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+    .pos-card{padding:10px 11px;border-radius:8px;background:rgba(255,255,255,.07)}
+    .pos-card .pc-lbl{font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;
+                      letter-spacing:.04em;display:flex;align-items:center;gap:5px;margin-bottom:3px}
+    .pc-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+    .pos-card .pc-val{font-size:21px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;line-height:1.15}
+    .pos-card .pc-unit{font-size:12px;color:rgba(255,255,255,.45)}
+    .pos-card .pc-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+    .pos-card.oor .pc-val{color:#F1948A}
+
+    .mean-box{background:rgba(255,255,255,.11);border-radius:8px;padding:13px;
+              display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .mean-box .ml{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:3px}
+    .mean-box .mv{font-size:30px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+    .mean-box .ms{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px}
+    .mean-box .mr{text-align:right}
+    .mean-box .sv{font-size:21px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+    .chip{padding:3px 9px;background:rgba(255,255,255,.08);border-radius:20px;font-size:11px;color:rgba(255,255,255,.55)}
+    .chip b{color:#fff;font-variant-numeric:tabular-nums}
+
+    .cons{padding:10px 13px;border-radius:8px;font-size:13px;font-weight:500;line-height:1.4;margin-bottom:8px}
+    .cons.good{background:rgba(26,122,74,.22);color:#A9DFBF}
+    .cons.warn{background:rgba(183,119,13,.22);color:#F8C471}
+    .cons.bad {background:rgba(192,57,43,.22);color:#F1948A}
+    .cons .ci{font-size:15px;margin-right:5px}
+
+    .rec-box{padding:10px 13px;border-radius:8px;font-size:12px;line-height:1.5;
+             background:rgba(192,57,43,.15);color:#F1948A;border:1px solid rgba(192,57,43,.3);margin-bottom:8px}
+    .rec-box b{color:#fff}
+
+    .pdf-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+             padding:12px;background:var(--navy2);color:#fff;border:none;border-radius:var(--radius);
+             cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;margin-top:10px}
+    .pdf-btn:hover{background:#1B4F72} .pdf-btn:active{transform:scale(.98)}
+
+    .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
   </style>
 </head>
 <body>
 <div class="app">
+
   <div class="hdr">
-    <div><h1>Meldeader-Kapazität</h1><p>Exzentrische Kapazitätsformel · EN 14419</p><p style="margin-bottom:-6px"><a href="https://github.com/MonkeyTor/loop-break" target="_blank" style="font-size:11px;color:var(--color-text-tertiary);text-decoration:none">github.com/MonkeyTor/loop-break</a></p></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-      <button class="gear" onclick="openS()">⚙ Einstellungen</button>
-      <span style="font-size:10px;color:var(--color-text-tertiary);font-family:monospace" id="eps-badge">εᵣ 1.20</span>
-    </div>
+    <div class="hdr-icon">⚡</div>
+    <div><h1>TipScale</h1>
+    <p>Nässe-Ortung · Widerstands-Referenz-Messverfahren · LUWA · Fernwärme</p></div>
   </div>
 
-  <!-- 1. PIPE -->
+  <!-- S0 Projekt -->
   <div class="card">
-    <div class="ctitle">1 · Mediumrohr</div>
-    <div class="pipe-mode-tab">
-      <button class="pmode-btn on" id="pmode-dn"  onclick="setPipeMode('dn')">DN-Typ → Stahlrohr</button>
-      <button class="pmode-btn"   id="pmode-kmr" onclick="setPipeMode('kmr')">KMR-Außen-⌀</button>
+    <div class="card-hdr" onclick="toggleCard('s0')">
+      <div class="card-htitle"><span class="card-icon">🏷️</span><h2>Projekt &amp; Identifikation</h2></div>
+      <span class="toggle-arr open" id="arr-s0">▼</span>
     </div>
-
-    <div id="pipe-dn-wrap">
-      <div class="f">
-        <label>Rohrtyp (Stahlrohr)</label>
-        <select id="dn-select" onchange="dnSelected()"><option value="">— DN wählen —</option></select>
+    <div class="card-body open" id="s0">
+      <div class="proj-grid">
+        <div class="field"><label>Kunde / Projekt</label>
+          <input class="fld" type="text" id="proj-name" placeholder="z. B. Muster AG"></div>
+        <div class="field"><label>Leitungs-ID</label>
+          <input class="fld" type="text" id="proj-lid" placeholder="z. B. VL-Nord-03"></div>
       </div>
-    </div>
-
-    <div id="pipe-kmr-wrap" style="display:none">
-      <div class="f">
-        <label>KMR Außendurchmesser (Premantrohr)</label>
-        <select id="kmr-select" onchange="kmrSelected()"><option value="">— KMR ⌀ wählen —</option></select>
-      </div>
-    </div>
-
-    <div class="pipe-result-row">
-      <span>Stahlrohr D:</span>
-      <span class="pipe-result-val" id="pipe-active-d">—</span>
-      <span style="margin-left:8px;font-size:11px;color:var(--color-text-tertiary)" id="pipe-active-wall"></span>
-      <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)" id="pipe-active-lbl">kein Typ gewählt</span>
     </div>
   </div>
 
-  <!-- 2. WIRE -->
+  <!-- S1 Leitungsabschnitt -->
   <div class="card">
-    <div class="ctitle">2 · Meldeader · System & Drahttyp</div>
-    <div class="sys-tab">
-      <button class="sys-btn on" id="sys-nordic"  onclick="setSys('nordic')">Nordic</button>
-      <button class="sys-btn"    id="sys-brandes" onclick="setSys('brandes')">Brandes</button>
-      <button class="sys-btn"    id="sys-ka"      onclick="setSys('ka')">KA</button>
+    <div class="card-hdr" onclick="toggleCard('s1')">
+      <div class="card-htitle"><span class="card-icon">📏</span><h2>Leitungsabschnitt &amp; Meldeader</h2>
+        <span class="badge" id="bdg1">–</span></div>
+      <span class="toggle-arr open" id="arr-s1">▼</span>
     </div>
-    <div style="display:flex;gap:7px;align-items:stretch">
-      <div style="flex:0 0 85%"><!-- wire-inner-start -->
-        <div id="wires-nordic">
-          <div class="wire-grid">
-            <div class="wire-card cu-blank on" id="w-cu-bare" onclick="setWire('cu-bare')">
-              <div><span class="wire-tag tag-cu-blank">Kupfer blank</span></div>
-              <div class="wire-name">Cu-Draht</div>
-              <div class="wire-spec">1.5 mm² · ø 1.382 mm</div>
-            </div>
-            <div class="wire-card cu-tin" id="w-cu-tin" onclick="setWire('cu-tin')">
-              <div><span class="wire-tag tag-cu-tin">Kupfer verzinnt</span></div>
-              <div class="wire-name">Cu/Sn-Draht</div>
-              <div class="wire-spec">1.5 mm² · ø 1.382 mm</div>
-            </div>
-          </div>
+    <div class="card-body open" id="s1">
+      <!-- Abschnitt 1 -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                  color:var(--navy);padding:8px 0 4px;border-bottom:1px solid var(--border);margin-bottom:4px">
+        Abschnitt 1 · Meldeader mit Nässebefall
+      </div>
+      <div class="field"><label>Meldeader (Adertyp)</label>
+        <select class="fld" id="wire-type" onchange="onWireType()">
+          <option value="nicr">Brandes Fühlerader · NiCr 80/20 · 0,189 mm² · 5,820 Ω/m</option>
+          <option value="curet">Brandes Rückführader · Cu · 0,490 mm² · 0,03517 Ω/m</option>
+          <option value="cu15" selected>Nordic · Cu blank · 1,5 mm² · 0,01149 Ω/m</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Betriebstemperatur<span class="beta-tag">Beta</span></label>
+        <div class="fld-row">
+          <input class="fld" type="number" id="temp-op" min="0" max="200" step="1"
+                 placeholder="20 °C (Referenz)" oninput="onWireType()">
+          <span class="fld-unit">°C</span>
         </div>
-        <div id="wires-brandes" style="display:none">
-          <div class="wire-grid">
-            <div class="wire-card nicr" id="w-nicr-res" onclick="setWire('nicr-res')">
-              <div><span class="wire-tag tag-nicr">Widerstandsdraht NiCr80/20</span></div>
-              <div class="wire-name">Fühlerader</div>
-              <div class="wire-spec">0.189 mm² ø 0.490 mm</div>
-            </div>
-            <div class="wire-card curet" id="w-nicr-ret" onclick="setWire('nicr-ret')">
-              <div><span class="wire-tag tag-ret">Cu · Rückführer</span></div>
-              <div class="wire-name">Rückführader</div>
-              <div class="wire-spec">0.490 mm² ø 0.790 mm</div>
-            </div>
-          </div>
-        </div>
-      <div id="ka-panel" style="display:none">
-        <div style="display:flex;gap:8px;align-items:flex-start">
-          <!-- Left: heading + Länge + offset -->
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px">8-adriges Ausführungskabel</div>
-            <div style="margin-bottom:6px">
-              <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Länge Kabel (Cu)</label>
-              <div style="display:flex;align-items:center;gap:4px">
-                <input type="number" id="ka-len" placeholder="m" step="0.5" min="0" value="5" inputmode="decimal"
-                  style="width:7ch;padding-top:4px;padding-bottom:4px;font-size:16px;font-weight:600;border-radius:var(--radius-md);border:0.5px solid var(--color-border-md)" oninput="let v=this.value;if(v.replace(/[^0-9]/g,'').length>2)this.value=v.slice(0,-1);calcKaOffset()">
-                <span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap">m</span>
-              </div>
-            </div>
-            <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 8px;background:var(--color-bg-secondary);border-radius:var(--radius-md);width:fit-content">
-              <span style="font-size:11px;color:var(--color-text-secondary)">Offset</span>
-              <span style="font-size:14px;font-weight:600;font-family:monospace;color:var(--color-text);min-width:2.5ch;text-align:right" id="ka-offset-pf">—</span>
-              <span style="font-size:11px;color:var(--color-text-secondary)">pF</span>
-              <span style="font-size:11px;color:var(--color-text-secondary)" id="ka-offset-detail"></span>
-            </div>
-          </div>
-          <!-- Center: Aderquerschnitt – same size/style as Aderposition, directly beside it -->
-          <div style="flex:0 0 auto">
-            <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px;text-align:center">Aderquerschnitt</label>
-            <div style="display:grid;grid-template-columns:1fr;gap:3px">
-              <button class="damm-btn on" id="ka-cs-0" onclick="setKaCs(0)" style="padding:5px 10px;font-size:11px">0,5 mm²</button>
-              <button class="damm-btn"    id="ka-cs-1" onclick="setKaCs(1)" style="padding:5px 10px;font-size:11px">1,0 mm²</button>
-              <button class="damm-btn"    id="ka-cs-2" onclick="setKaCs(2)" style="padding:5px 10px;font-size:11px">1,5 mm²</button>
-            </div>
-          </div>
-          <!-- Right: Aderposition – unchanged -->
-          <div style="flex:0 0 auto">
-            <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:3px;text-align:center">Aderposition</label>
-            <div style="display:grid;grid-template-columns:1fr;gap:3px">
-              <button class="damm-btn"    id="ka-pos-0" onclick="setKaPos(0)" data-d="2.9" style="padding:5px 10px;font-size:11px">Benachbart</button>
-              <button class="damm-btn on" id="ka-pos-1" onclick="setKaPos(1)" data-d="5.4" style="padding:5px 10px;font-size:11px">Übernächst</button>
-              <button class="damm-btn"    id="ka-pos-2" onclick="setKaPos(2)" data-d="7.5" style="padding:5px 10px;font-size:11px">Gegenüber</button>
-            </div>
-          </div>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px" id="temp-info"></div>
+      </div>
+      <div class="info-row">
+        <span class="lbl">r Abschnitt 1 (temperaturkorrigiert)</span>
+        <span class="val" id="r-per-m-lbl">0,01149 Ω/m</span>
+      </div>
+      <div class="field"><label>Gesamtlänge Leitungsabschnitt</label>
+        <div class="fld-row">
+          <input class="fld" type="number" id="len-total" min="0" step="0.01" placeholder="Länge in m" oninput="onLen1()">
+          <span class="fld-unit">m</span>
         </div>
       </div>
-      </div><!-- wire-inner-end -->
-      <div style="flex:0 0 calc(15% - 7px)">
-        <div class="wire-card ka-wire" id="w-ka" onclick="kaToMemo2()"
-          style="height:100%;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer">
-          <div style="font-size:10px;font-weight:600;text-align:center;line-height:1.5;color:#7F1D1D">KA-Wert<br>in Merk2</div>
+      <button class="seg-btn" onclick="toggleSeg()">
+        <span id="seg-arr">▶</span> Aus Teilabschnitten (max. 70)
+      </button>
+      <div class="seg-panel" id="seg-panel">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:7px">Längen in m · Reihenfolge wie im Plan</div>
+        <div class="seg-grid" id="seg-grid"></div>
+        <div class="info-row"><span class="lbl">Summe</span><span class="val" id="seg-sum">0,00 m</span></div>
+        <button class="seg-useBtn" onclick="useSeg()">↑ Als Gesamtlänge übernehmen</button>
+      </div>
+      <div class="info-row"><span class="lbl">R Abschnitt 1 gesamt</span><span class="val" id="r-main-lbl">–</span></div>
+
+      <!-- Abschnitt 2 Toggle -->
+      <div style="margin-top:14px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
+          <input type="checkbox" id="sec2-active" onchange="toggleSec2()" style="width:18px;height:18px;cursor:pointer">
+          <span style="font-size:12px;font-weight:600;color:var(--navy)">
+            2. Leitungsabschnitt verwenden (trockene Rückführader)
+          </span>
+        </label>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px;margin-left:28px">
+          Trockene Rückführader ersetzt HFL · unabhängige Temperatur möglich
         </div>
+      </div>
+
+      <!-- Abschnitt 2 Panel -->
+      <div id="sec2-panel" style="display:none;margin-top:10px;background:var(--bg);border-radius:8px;padding:11px;border:1.5px solid var(--border)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                    color:var(--navy);margin-bottom:8px">
+          Abschnitt 2 · Trockene Rückführader
+        </div>
+        <div class="field" style="margin-top:0"><label>Meldeader (Adertyp)</label>
+          <select class="fld" id="wire-type2" onchange="onWireType2()">
+            <option value="nicr">Brandes Fühlerader · NiCr 80/20 · 0,189 mm² · 5,820 Ω/m</option>
+            <option value="curet">Brandes Rückführader · Cu · 0,490 mm² · 0,03517 Ω/m</option>
+            <option value="cu15" selected>Nordic · Cu blank · 1,5 mm² · 0,01149 Ω/m</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Betriebstemperatur<span class="beta-tag">Beta</span></label>
+          <div class="fld-row">
+            <input class="fld" type="number" id="temp-op2" min="0" max="200" step="1"
+                   placeholder="20 °C (Referenz)" oninput="onWireType2()">
+            <span class="fld-unit">°C</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:3px" id="temp-info2"></div>
+        </div>
+        <div class="info-row" style="margin-top:6px">
+          <span class="lbl">r Abschnitt 2 (temperaturkorrigiert)</span>
+          <span class="val" id="r-per-m-lbl2">0,01149 Ω/m</span>
+        </div>
+        <div class="field">
+          <label>Länge Abschnitt 2</label>
+          <div class="fld-row">
+            <input class="fld" type="number" id="len-total2" min="0" step="0.01"
+                   placeholder="Wie Abschnitt 1 wenn leer" oninput="calc()">
+            <span class="fld-unit">m</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:3px">
+            Leer lassen = gleiche Länge wie Abschnitt 1 (VL = RL)
+          </div>
+        </div>
+        <div class="info-row"><span class="lbl">R Abschnitt 2 gesamt</span><span class="val" id="r-main-lbl2">–</span></div>
       </div>
     </div>
   </div>
 
-  <!-- 3. DELTA -->
+  <!-- S2 HFL -->
   <div class="card">
-    <div class="ctitle">3 · Abstand Draht → Rohrwand · δ</div>
-
-    <!-- Dämmstärke selector (shown when DN selected) -->
-    <div id="damm-section" style="display:none">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">Dämmstärke wählen:</div>
-      <div class="damm-cards" id="damm-cards"></div>
+    <div class="card-hdr" onclick="toggleCard('s2')">
+      <div class="card-htitle"><span class="card-icon">🔌</span><h2>Hilfsleitungen (HFL)</h2>
+        <span class="badge" id="bdg2">0,00 Ω</span></div>
+      <span class="toggle-arr open" id="arr-s2">▼</span>
     </div>
-
-    <!-- Fallback: free slider (always visible) -->
-    <div class="delta-top">
-      <div class="delta-numunit">
-        <span class="delta-num" id="delta-disp">19</span>
-        <span class="delta-unit">mm</span>
-      </div>
-      <input type="range" id="delta-range" min="10" max="120" step="0.5" value="19" oninput="deltaSlide(this.value)">
+    <div class="card-body open" id="s2">
+      <p style="font-size:12px;color:var(--text2);margin-top:8px;line-height:1.4">
+        Rückführung der Messschleife · Gesamtwiderstand je HFL · max. 5 in Serie.
+      </p>
+      <div class="aux-list" id="aux-list"></div>
+      <button class="btn-add" id="btn-add" onclick="addAux()">＋ HFL hinzufügen</button>
+      <div class="info-row"><span class="lbl">R HFL total</span><span class="val" id="r-aux-lbl">0,00 Ω</span></div>
     </div>
   </div>
 
-  <!-- 4. MEASUREMENT -->
+  <!-- S3 KA -->
   <div class="card">
-    <div class="ctitle">4 · Messwerte <span style="font-size:10px;color:var(--color-text-tertiary);font-weight:400;text-transform:none;letter-spacing:0">bei <span style="color:#dc2626">1 kHz</span> Messfrequenz</span></div>
-    <div style="display:flex;gap:6px;align-items:flex-end;width:100%">
-      <div class="f" style="flex:1;min-width:0">
-        <label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Kapazität gemessen</label>
-        <div class="memo-field-wrap">
-          <input type="number" id="c-meas" placeholder="pF" step="1" min="0" inputmode="numeric"
-            style="width:100%;background:#FEFCE8;border-color:#CA8A04;color:#1C1917;-webkit-text-fill-color:#1C1917"
-            oninput="let v=this.value.replace(/\D/g,'');if(v.length>5)v=v.slice(0,5);this.value=v">
-          <button class="memo-clear" onclick="document.getElementById('c-meas').value=''" title="löschen">✕</button>
+    <div class="card-hdr" onclick="toggleCard('s3')">
+      <div class="card-htitle"><span class="card-icon">🔗</span><h2>Kabelausführungen (KA)</h2>
+        <span class="badge" id="bdg3">optional</span></div>
+      <span class="toggle-arr" id="arr-s3">▼</span>
+    </div>
+    <div class="card-body" id="s3">
+      <p style="font-size:12px;color:var(--text2);margin-top:8px;margin-bottom:10px;line-height:1.4">
+        Ausführungskabel von MKL bis Meldeader · Cu DIN 47001.
+      </p>
+      <div class="ka-cols">
+        <div class="ka-col ka-a"><h3>🔴 Messpunkt A</h3>
+          <select class="ka-fld" id="ka-a-cross" onchange="calcKA('a')">
+            <option value="0">Kein KA</option><option value="0.5">0,5 mm²</option>
+            <option value="1.0">1,0 mm²</option><option value="1.5">1,5 mm²</option>
+            <option value="cust">Manuell (Ω)</option>
+          </select>
+          <input class="ka-fld" type="number" id="ka-a-len" min="0" step="0.01" placeholder="Länge (m)" oninput="calcKA('a')">
+          <div id="ka-a-ohm-wrap" style="display:none">
+            <input class="ka-fld" type="number" id="ka-a-ohm" min="0" step="0.01" placeholder="Widerstand (Ω)" oninput="calcKA('a')">
+          </div>
+          <div class="ka-r">R<sub>KA-A</sub> = <b id="ka-a-r">0,00 Ω</b></div>
         </div>
-      </div>
-      <div class="f" style="flex:0 0 auto">
-        <label style="white-space:nowrap;font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Eichwert</label>
-        <input type="number" id="c-off" step="1" min="0" inputmode="numeric"
-          style="width:6.5ch;min-width:0;display:block"
-          oninput="let v=this.value.replace(/\D/g,'');if(v.length>3)v=v.slice(0,3);this.value=v">
-      </div>
-      <div class="f" style="flex:1;min-width:0">
-        <label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Merk1 <span style="font-size:10px;color:var(--color-text-tertiary);font-weight:400">inkl. Eichwert</span></label>
-        <div class="memo-field-wrap">
-          <input type="number" id="c-memo" placeholder="pF" step="1" min="0" inputmode="numeric"
-            style="width:100%"
-            oninput="let v=this.value.replace(/\D/g,'');if(v.length>5)v=v.slice(0,5);this.value=v;updateMemoStyle()">
-          <button class="memo-clear" onclick="clearMemo1()" title="löschen">✕</button>
-        </div>
-      </div>
-      <div class="f" style="flex:1;min-width:0">
-        <label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:3px">Merk2 <span style="font-size:10px;color:var(--color-text-tertiary);font-weight:400">exkl. Eichwert</span></label>
-        <div class="memo-field-wrap">
-          <input type="number" id="c-memo2" placeholder="pF" step="1" min="0" inputmode="numeric"
-            style="width:100%"
-            oninput="let v=this.value.replace(/\D/g,'');if(v.length>4)v=v.slice(0,4);this.value=v;updateMemo2Style()">
-          <button class="memo-clear" onclick="clearMemo2()" title="löschen">✕</button>
+        <div class="ka-col ka-b"><h3>🔵 Messpunkt B</h3>
+          <select class="ka-fld" id="ka-b-cross" onchange="calcKA('b')">
+            <option value="0">Kein KA</option><option value="0.5">0,5 mm²</option>
+            <option value="1.0">1,0 mm²</option><option value="1.5">1,5 mm²</option>
+            <option value="cust">Manuell (Ω)</option>
+          </select>
+          <input class="ka-fld" type="number" id="ka-b-len" min="0" step="0.01" placeholder="Länge (m)" oninput="calcKA('b')">
+          <div id="ka-b-ohm-wrap" style="display:none">
+            <input class="ka-fld" type="number" id="ka-b-ohm" min="0" step="0.01" placeholder="Widerstand (Ω)" oninput="calcKA('b')">
+          </div>
+          <div class="ka-r">R<sub>KA-B</sub> = <b id="ka-b-r">0,00 Ω</b></div>
         </div>
       </div>
     </div>
-    <div class="warn" id="w-neg">⚠ Eichwert ≥ Messwert – Eingabe prüfen</div>
   </div>
 
-  <div class="btn-row">
-    <button class="btn btn-calc" onclick="calc()">Länge berechnen ↗</button>
-    <button class="btn-memo" onclick="saveMemo1()">Merk1</button>
-    <button class="btn-memo" onclick="saveMemo2()">Merk2</button>
-  </div>
-
-  <!-- 5. RESULT -->
-  <div class="res" id="res-card">
-    <div class="rlabel" style="text-transform:none">Berechnete Leitungslänge</div>
-    <div class="res-inner">
-      <div class="res-main">
-        <div class="rval" id="r-len">—<span class="runit"> m</span></div>
-        <div class="ralt" id="r-alt"></div>
+  <!-- S4 R_ges -->
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard('s4')">
+      <div class="card-htitle"><span class="card-icon">🔢</span><h2>Gesamtschleifenwiderstand R<sub>ges</sub></h2>
+        <span class="badge" id="bdg4">–</span></div>
+      <span class="toggle-arr open" id="arr-s4">▼</span>
+    </div>
+    <div class="card-body open" id="s4">
+      <div class="rges-box">
+        <div class="rges-title">R<sub>ges</sub> Übersicht</div>
+        <div class="rges-row"><span class="rl">Berechnet aus Eingaben</span><span class="rv" id="rges-calc-lbl">–</span></div>
+        <div class="rges-row"><span class="rl">Manuell gemessen</span><span class="rv manual" id="rges-man-lbl">–</span></div>
+        <div class="rges-diff" id="rges-diff"></div>
       </div>
-      <div class="memo-result" id="memo-result-box">
-        <div class="memo-result-label" style="text-transform:none">Abgang 1</div>
-        <div class="memo-result-val" id="memo-result-val">—</div>
-        <div class="memo-result-unit" id="memo-result-unit">m</div>
-      </div>
-      <div class="memo-result" id="memo2-result-box">
-        <div class="memo-result-label" style="text-transform:none">Abgang 2</div>
-        <div class="memo-result-val" id="memo2-result-val">—</div>
-        <div class="memo-result-unit" id="memo2-result-unit">m</div>
+      <div class="field"><label>Manuell gemessener R<sub>ges</sub> (Ohmmeter)</label>
+        <div class="fld-row">
+          <input class="fld" type="number" id="rges-man" min="0" step="0.01"
+                 placeholder="Gemessener Gesamtwiderstand" oninput="calc()">
+          <span class="fld-unit">Ω</span>
+        </div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;line-height:1.4">
+          Erfasst reale Übergangswiderstände · erzeugt 2. unabhängigen Ergebnissatz.
+        </div>
       </div>
     </div>
   </div>
-  <div class="rdetail" id="r-detail"></div>
-  <div class="fbox" id="fbox">C_netto = C_gemessen − C_Eichwert  ·  C/L = 2π·ε₀·εᵣ / arcosh((R²+r²−e²) / (2Rr))</div>
+
+  <!-- S5 Messwerte -->
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard('s5')">
+      <div class="card-htitle"><span class="card-icon">📊</span><h2>Messwerte · 4 × %</h2></div>
+      <span class="toggle-arr open" id="arr-s5">▼</span>
+    </div>
+    <div class="card-body open" id="s5">
+      <p style="font-size:12px;color:var(--text2);margin-top:8px;line-height:1.4">
+        Brücken-Drehknopfstellung ablesen.
+        <b style="color:var(--red)">MKL rot</b> = Richtung Meldeader,
+        <b style="color:var(--blue-t)">MKL blau</b> = über HFL. Summe ≈ 100 %.
+      </p>
+
+      <div class="side-lbl">Messung am Messpunkt A</div>
+      <div id="chain-a" class="chain-display"></div>
+      <div class="term-pair">
+        <div class="term-field tf-r">
+          <label><span class="tdot r"></span> Fall 1 · MKL rot → Meldeader</label>
+          <input class="term-inp" type="number" id="pRA" min="0" max="100" step="0.01" inputmode="decimal" placeholder="%" oninput="calc()">
+        </div>
+        <div class="term-field tf-b">
+          <label><span class="tdot b"></span> Fall 2 · MKL rot → HFL</label>
+          <input class="term-inp" type="number" id="pBA" min="0" max="100" step="0.01" inputmode="decimal" placeholder="%" oninput="calc()">
+        </div>
+      </div>
+      <div class="sum-chk" id="sum-a"></div>
+
+      <div class="side-lbl" style="margin-top:18px">Messung am Messpunkt B (optional)</div>
+      <div id="chain-b" class="chain-display"></div>
+      <div class="term-pair">
+        <div class="term-field tf-r">
+          <label><span class="tdot r"></span> Fall 3 · MKL rot → Meldeader</label>
+          <input class="term-inp" type="number" id="pRB" min="0" max="100" step="0.01" inputmode="decimal" placeholder="%" oninput="calc()">
+        </div>
+        <div class="term-field tf-b">
+          <label><span class="tdot b"></span> Fall 4 · MKL rot → HFL</label>
+          <input class="term-inp" type="number" id="pBB" min="0" max="100" step="0.01" inputmode="decimal" placeholder="%" oninput="calc()">
+        </div>
+      </div>
+      <div class="sum-chk" id="sum-b"></div>
+
+      <p style="font-size:11px;color:var(--text2);margin-top:12px;line-height:1.5">
+        <b>Fall 1 ≈ Fall 4</b> · MP-A-Seite — sollten übereinstimmen.<br>
+        <b>Fall 2 ≈ Fall 3</b> · MP-B-Seite — sollten übereinstimmen.
+      </p>
+    </div>
+  </div>
+
+  <!-- ERGEBNIS (unten) -->
+  <div class="results" id="results">
+    <div class="res-title">📍 Ergebnis</div>
+    <div class="no-res" id="no-res">Leitungsdaten und Messwerte eingeben.</div>
+    <div id="res-content" style="display:none">
+      <div class="chips" id="chips"></div>
+      <div class="res-tabs" id="res-tabs" style="display:none">
+        <button class="res-tab active" id="tab-calc" onclick="switchTab('calc')">Berechnet</button>
+        <button class="res-tab" id="tab-man" onclick="switchTab('man')">Manuell R<sub>ges</sub></button>
+      </div>
+      <div class="res-pane active" id="pane-calc">
+        <div class="ruler" id="ruler-calc"><div class="ruler-track"></div>
+          <div class="ruler-lbl la">MP-A  0 m</div>
+          <div class="ruler-lbl lb" id="rlbl-calc">MP-B  – m</div></div>
+        <div class="ruler-legend" id="rleg-calc"></div>
+        <div class="pos-grid" id="pgrid-calc"></div>
+        <div class="mean-box" id="mbox-calc"></div>
+        <div class="cons" id="cons-calc"></div>
+        <div class="rec-box" id="rec-calc" style="display:none"></div>
+      </div>
+      <div class="res-pane" id="pane-man">
+        <div class="ruler" id="ruler-man"><div class="ruler-track"></div>
+          <div class="ruler-lbl la">MP-A  0 m</div>
+          <div class="ruler-lbl lb" id="rlbl-man">MP-B  – m</div></div>
+        <div class="ruler-legend" id="rleg-man"></div>
+        <div class="pos-grid" id="pgrid-man"></div>
+        <div class="mean-box" id="mbox-man"></div>
+        <div class="cons" id="cons-man"></div>
+        <div class="rec-box" id="rec-man" style="display:none"></div>
+      </div>
+      <button class="pdf-btn" onclick="exportPDF()">📄 Messbericht als PDF exportieren</button>
+    </div>
+  </div>
+
 </div>
-
-<!-- SETTINGS -->
-<div class="modal-ov" id="smod">
-<div class="modal">
-  <div class="mhdr"><h2>Einstellungen</h2><button class="xbtn" onclick="closeS()">✕</button></div>
-  <div class="slabel">PUR-Schaum · Dielektrikum εᵣ</div>
-  <div class="f">
-    <input type="number" id="s-eps" step="0.01" min="1.0" max="10" inputmode="decimal" oninput="updateEpsBadge();updateEpsBtns();">
-    <div class="hint">Trocken 1.1–1.3 · Gealtert ~1.5 · Feucht bis 2.5</div>
-  </div>
-  <div class="row3" style="margin-bottom:6px">
-    <button style="border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 4px;font-size:11px;cursor:pointer;background:var(--color-bg);color:var(--color-text-secondary)" class="eps-btn" data-eps="1.1" onclick="setEps(1.1)">Trocken<br><span style="font-size:10px">εᵣ 1.10</span></button>
-    <button style="border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 4px;font-size:11px;cursor:pointer;background:var(--color-bg);color:var(--color-text-secondary)" class="eps-btn" data-eps="1.2" onclick="setEps(1.2)">Standard<br><span style="font-size:10px">εᵣ 1.20</span></button>
-    <button style="border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 4px;font-size:11px;cursor:pointer;background:var(--color-bg);color:var(--color-text-secondary)" class="eps-btn" data-eps="1.35" onclick="setEps(1.35)">Leicht gealt.<br><span style="font-size:10px">εᵣ 1.35</span></button>
-    <button style="border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 4px;font-size:11px;cursor:pointer;background:var(--color-bg);color:var(--color-text-secondary)" class="eps-btn" data-eps="1.5" onclick="setEps(1.5)">Gealtert<br><span style="font-size:10px">εᵣ 1.50</span></button>
-    <button style="border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 4px;font-size:11px;cursor:pointer;background:var(--color-bg);color:var(--color-text-secondary)" class="eps-btn" data-eps="2.0" onclick="setEps(2.0)">Feucht<br><span style="font-size:10px">εᵣ 2.00</span></button>
-    <button style="border:0.5px solid var(--color-border-md);border-radius:var(--radius-md);padding:7px 4px;font-size:11px;cursor:pointer;background:var(--color-bg);color:var(--color-text-secondary)" class="eps-btn" data-eps="2.5" onclick="setEps(2.5)">Stark feucht<br><span style="font-size:10px">εᵣ 2.50</span></button>
-  </div>
-  <hr class="divider">
-  <div class="slabel">Nordic · Messschieber-Istwert</div>
-  <div class="row">
-    <div class="f">
-      <label>Cu blank · ø (mm)</label>
-      <input type="number" id="s-cu-bare-d" step="0.001" min="1.0" max="1.6" inputmode="decimal" oninput="refreshDDisplay()">
-      <div class="hint">Nennwert 1.382 mm</div>
-    </div>
-    <div class="f">
-      <label>Cu verzinnt · ø (mm)</label>
-      <input type="number" id="s-cu-tin-d" step="0.001" min="1.0" max="1.6" inputmode="decimal" oninput="refreshDDisplay()">
-      <div class="hint">Nennwert 1.382 mm</div>
-    </div>
-  </div>
-  <hr class="divider">
-  <div class="slabel">Brandes · Drahtdurchmesser</div>
-  <div class="row">
-    <div class="f">
-      <label>Fühlerader NiCr 80/20 ø (mm)</label>
-      <input type="number" id="s-nicr-res-d" step="0.001" min="0.1" inputmode="decimal" oninput="refreshDDisplay()">
-      <div class="hint">Ni 80% · Cr 20% · 0.189 mm²</div>
-    </div>
-    <div class="f">
-      <label>Rückführader Cu ø (mm)</label>
-      <input type="number" id="s-nicr-ret-d" step="0.001" min="0.1" inputmode="decimal" oninput="refreshDDisplay()">
-      <div class="hint">0.490 mm²</div>
-    </div>
-  </div>
-  <hr class="divider">
-  <div class="slabel">Kalibrierung Messgerät</div>
-  <div class="row">
-    <div class="f">
-      <label>Standard-Eichwert (pF)</label>
-      <input type="number" id="s-eich" step="1" min="0" inputmode="numeric">
-      <div class="hint">Wird beim Übernehmen übertragen</div>
-    </div>
-    <div class="f">
-      <label>Gerätefaktor K</label>
-      <input type="number" id="s-kcal" step="0.001" min="0.8" max="1.2" inputmode="decimal">
-    </div>
-  </div>
-  <div class="f">
-    <label>Feldfaktor (empirisch)</label>
-    <input type="number" id="s-kman" step="0.001" min="0.5" max="2.0" inputmode="decimal">
-    <div class="hint">1.000 = kein Korrekturbedarf</div>
-  </div>
-  <hr class="divider">
-  <div class="slabel">Ausgabe</div>
-  <div class="f">
-    <select id="s-unit"><option value="m">Meter (m)</option><option value="km">Kilometer (km)</option></select>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
-    <button class="reset-link" onclick="resetS()">Standardwerte laden</button>
-    <button class="btn" style="width:auto;padding:10px 24px" onclick="applyAndClose()">Übernehmen</button>
-  </div>
-</div>
-</div>
-
 <script>
-const EPS0 = 8.854e-12;
+const RHO_CU=0.01724;
+const WIRE_R20={nicr:5.820,curet:0.03517,cu15:0.01149};
+const WIRE_ALPHA={nicr:0.00017,curet:0.00393,cu15:0.00393};
+const WIRE_NAME={nicr:'Brandes Fühlerader NiCr 80/20',curet:'Brandes Rückführader Cu 0,490 mm²',cu15:'Nordic Cu blank 1,5 mm²'};
+const SEG=70,MAX_AUX=5;
+let auxIdx=0,auxCount=0,segOpen=false,activeTab='calc';
 
-// ── Pipe/insulation table from ODS ────────────────────────────────────────
-// Each entry: [dn, d_steel_mm, wall_mm, [kmr1,delta1], [kmr2,delta2], [kmr3,delta3], [kmr4,delta4]]
-const PIPE_TABLE = [
-  [20,  26.9, 2.65, [90,15],   [110,19],  [125,23],  [140,26.5]],
-  [25,  33.7, 2.6,  [90,15],   [110,17.5],[125,21.5], [140,25]],
-  [32,  42.4, 2.6,  [110,15.5],[125,19],  [140,23],  [160,28]],
-  [40,  48.3, 2.6,  [110,15],  [125,17.5],[140,21.5], [160,26.5]],
-  [50,  60.3, 2.9,  [125,15],  [140,18.5],[160,23.5], [180,28.5]],
-  [65,  76.1, 2.9,  [140,15],  [160,19.5],[180,24.5], [200,29.5]],
-  [80,  88.9, 3.2,  [160,16.5],[180,21.5],[200,26],   [225,33]],
-  [100,114.3, 3.6,  [200,20],  [225,26],  [250,32],   [280,39]],
-  [125,139.7, 3.6,  [225,19.5],[250,25.5],[280,33],   [315,41.5]],
-  [150,168.3, 4.0,  [250,18.5],[280,25.5],[315,34],   [355,44]],
-  [200,219.1, 4.5,  [315,21.5],[355,31],  [400,42],   [450,54.5]],
-  [250,273.0, 5.0,  [400,28.5],[450,41],  [500,53.5], [560,67.5]],
-  [300,323.9, 5.6,  [450,28.5],[500,40.5],[560,55.5], [630,72.5]],
-  [350,355.6, 5.6,  [500,33],  [560,47.5],[630,64.5], [710,84]],
-  [400,406.4, 6.3,  [560,34.5],[630,52],  [710,71.5], [800,94]],
-  [450,457.2, 6.3,  [630,39],  [710,49],  [800,81.2], [900,105.5]],
-  [500,508.0, 6.3,  [710,46],  [800,68],  [900,93],   [1000,117.5]],
-];
+// 2 NK erzwingen
+document.addEventListener('input',function(e){
+  const el=e.target;
+  if(el.type!=='number') return;
+  const v=el.value;
+  if(v===''||v==='-') return;
+  const d=v.indexOf('.');
+  if(d!==-1&&v.length-d-1>2){el.value=parseFloat(v).toFixed(2);el.dispatchEvent(new Event('input',{bubbles:false}));}
+},true);
 
-// Build lookup by KMR diameter → list of matching rows+damm index
-const KMR_MAP = {}; // kmr_d → [{pipe, dammIdx}]
-PIPE_TABLE.forEach(row => {
-  for(let i=0;i<4;i++){
-    const kmr = row[3+i][0];
-    if(!KMR_MAP[kmr]) KMR_MAP[kmr]=[];
-    KMR_MAP[kmr].push({pipe:row, dammIdx:i});
+function init(){
+  const g=document.getElementById('seg-grid');
+  for(let i=0;i<SEG;i++){
+    const inp=document.createElement('input');
+    inp.type='number';inp.className='seg-inp';inp.min='0';inp.step='0.01';inp.placeholder=i+1;
+    inp.oninput=onSeg;g.appendChild(inp);
   }
-});
-
-// ── Defaults ──────────────────────────────────────────────────────────────
-const DEFAULTS = {
-  delta:     19, pipeDN: 48.3, dammIdx: 1,
-  eich: 15, eps: 1.2, kcal: 1.000, kman: 1.000,
-  cuBareD: 1.380, cuTinD: 1.380, nicrResD: 0.490, nicrRetD: 0.790,
-  unit: 'm', sys: 'nordic', wire: 'cu-bare', pipeMode: 'dn',
-};
-
-function load(key,fb){const v=localStorage.getItem(key);return v===null?fb:v;}
-function save(key,val){localStorage.setItem(key,String(val));}
-
-function saveSettings(){
-  ['s-eps','s-cu-bare-d','s-cu-tin-d','s-nicr-res-d','s-nicr-ret-d','s-eich','s-kcal','s-kman','s-unit']
-    .forEach(id=>save(id, document.getElementById(id).value));
-}
-function loadSettings(){
-  document.getElementById('s-eps').value        = load('s-eps',        DEFAULTS.eps);
-  document.getElementById('s-cu-bare-d').value  = load('s-cu-bare-d',  DEFAULTS.cuBareD);
-  document.getElementById('s-cu-tin-d').value   = load('s-cu-tin-d',   DEFAULTS.cuTinD);
-  document.getElementById('s-nicr-res-d').value = load('s-nicr-res-d', DEFAULTS.nicrResD);
-  document.getElementById('s-nicr-ret-d').value = load('s-nicr-ret-d', DEFAULTS.nicrRetD);
-  document.getElementById('s-eich').value       = load('s-eich',       DEFAULTS.eich);
-  document.getElementById('s-kcal').value       = load('s-kcal',       DEFAULTS.kcal);
-  document.getElementById('s-kman').value       = load('s-kman',       DEFAULTS.kman);
-  document.getElementById('s-unit').value       = load('s-unit',       DEFAULTS.unit);
+  addAux();onWireType();onWireType2();updateChainDisplay();
 }
 
-// ── Populate DN select ────────────────────────────────────────────────────
-(function(){
-  const sel = document.getElementById('dn-select');
-  PIPE_TABLE.forEach(row => {
-    const o = document.createElement('option');
-    o.value = row[1]; // steel OD
-    o.dataset.dn   = row[0];
-    o.dataset.wall = row[2];
-    o.dataset.idx  = PIPE_TABLE.indexOf(row);
-    o.textContent  = `DN ${row[0]}  · ø ${row[1]} mm`;
-    sel.appendChild(o);
+function toggleCard(id){
+  const b=document.getElementById(id),a=document.getElementById('arr-'+id);
+  a.classList.toggle('open',b.classList.toggle('open'));
+}
+function switchTab(t){
+  activeTab=t;
+  ['calc','man'].forEach(s=>{
+    document.getElementById('tab-'+s).classList.toggle('active',s===t);
+    document.getElementById('pane-'+s).classList.toggle('active',s===t);
   });
-})();
+}
 
-// ── Populate KMR select: one row per KMR+DammIdx pair, sorted by KMR ⌀ ──
-(function(){
-  const sel = document.getElementById('kmr-select');
-  // Build flat list: [{kmr, dammIdx, pipe}], sorted by kmr asc, then dammIdx asc
-  const entries = [];
-  PIPE_TABLE.forEach(row => {
-    for(let i=0;i<4;i++){
-      entries.push({kmr:row[3+i][0], delta:row[3+i][1], dammIdx:i, pipe:row});
+// ── Abschnitt 1 ──────────────────────────────────────
+function getRpm(){
+  const t=document.getElementById('wire-type').value;
+  const T=parseFloat(document.getElementById('temp-op').value);
+  const temp=(!isNaN(T)&&T>=0)?T:20;
+  return WIRE_R20[t]*(1+WIRE_ALPHA[t]*(temp-20));
+}
+function onWireType(){
+  const t=document.getElementById('wire-type').value;
+  const r=getRpm(),r20=WIRE_R20[t];
+  document.getElementById('r-per-m-lbl').textContent=fR4(r)+' Ω/m';
+  const T=parseFloat(document.getElementById('temp-op').value);
+  const ti=document.getElementById('temp-info');
+  if(!isNaN(T)&&T!==20){
+    const c=((r-r20)/r20*100);
+    ti.textContent=`Korrektur bei ${T}°C: ${c>=0?'+':''}${c.toFixed(2)}% ggü. 20°C`;
+  } else { ti.textContent=''; }
+  updateRMain();calc();
+}
+
+// ── Abschnitt 2 ──────────────────────────────────────
+function isSec2Active(){return document.getElementById('sec2-active').checked;}
+function toggleSec2(){
+  document.getElementById('sec2-panel').style.display=isSec2Active()?'block':'none';
+  updateChainDisplay();updateRgesDisplay();calc();
+}
+function getRpm2(){
+  const t=document.getElementById('wire-type2').value;
+  const T=parseFloat(document.getElementById('temp-op2').value);
+  const temp=(!isNaN(T)&&T>=0)?T:20;
+  return WIRE_R20[t]*(1+WIRE_ALPHA[t]*(temp-20));
+}
+function getLen2(){
+  // Leer = gleiche Länge wie Abschnitt 1
+  const v=parseFloat(document.getElementById('len-total2').value);
+  return (!isNaN(v)&&v>0)?v:getLen();
+}
+function getSec2R(){
+  if(!isSec2Active()) return 0;
+  return getLen2()*getRpm2();
+}
+function onWireType2(){
+  const t=document.getElementById('wire-type2').value;
+  const r=getRpm2(),r20=WIRE_R20[t];
+  document.getElementById('r-per-m-lbl2').textContent=fR4(r)+' Ω/m';
+  const T=parseFloat(document.getElementById('temp-op2').value);
+  const ti=document.getElementById('temp-info2');
+  if(!isNaN(T)&&T!==20){
+    const c=((r-r20)/r20*100);
+    ti.textContent=`Korrektur bei ${T}°C: ${c>=0?'+':''}${c.toFixed(2)}% ggü. 20°C`;
+  } else { ti.textContent=''; }
+  updateRMain();calc();
+}
+
+// ── Ra = R_HFL + R_Abschnitt2 (beide können 0 sein) ──
+function getRa(){return getAuxR()+getSec2R();}
+
+function toggleSeg(){
+  segOpen=!segOpen;
+  document.getElementById('seg-panel').classList.toggle('open',segOpen);
+  document.getElementById('seg-arr').textContent=segOpen?'▼':'▶';
+}
+function onSeg(){
+  document.getElementById('seg-sum').textContent=fL(getSegSum())+' m';calc();
+}
+function getSegSum(){
+  let s=0;document.querySelectorAll('#seg-grid .seg-inp').forEach(i=>s+=parseFloat(i.value)||0);return s;
+}
+function useSeg(){document.getElementById('len-total').value=getSegSum().toFixed(2);updateRMain();calc();}
+function getLen(){return parseFloat(document.getElementById('len-total').value)||0;}
+function onLen1(){updateRMain();calc();}
+function updateRMain(){
+  const L=getLen(),r=getRpm();
+  document.getElementById('r-main-lbl').textContent=(L>0&&r>0)?fR4(L*r)+' Ω':'–';
+  document.getElementById('bdg1').textContent=L>0?fL(L)+' m':'–';
+  // Abschnitt 2 Anzeige aktualisieren
+  if(isSec2Active()){
+    const L2=getLen2(),r2=getRpm2();
+    document.getElementById('r-main-lbl2').textContent=(L2>0&&r2>0)?fR4(L2*r2)+' Ω':'–';
+  }
+  updateRgesDisplay();
+}
+
+function addAux(){
+  if(auxCount>=MAX_AUX) return;
+  auxCount++;
+  const id='ax'+(++auxIdx),div=document.createElement('div');
+  div.className='aux-row';div.id=id;
+  div.innerHTML=`<input class="fld" type="text" placeholder="HFL ${auxCount}" style="font-size:13.5px;padding:9px 10px">
+    <input class="fld" type="number" min="0" step="0.01" placeholder="0,00"
+           style="font-size:13.5px;padding:9px 10px;text-align:right" oninput="updateAux()">
+    <button class="btn-rm" onclick="removeAux('${id}')">✕</button>`;
+  document.getElementById('aux-list').appendChild(div);
+  if(auxCount>=MAX_AUX) document.getElementById('btn-add').disabled=true;
+  updateAux();
+}
+function removeAux(id){
+  const el=document.getElementById(id);if(el){el.remove();auxCount--;}
+  document.getElementById('btn-add').disabled=false;updateAux();
+}
+function getAuxR(){
+  let s=0;document.querySelectorAll('#aux-list .aux-row input[type="number"]').forEach(i=>s+=parseFloat(i.value)||0);return s;
+}
+function updateAux(){
+  const R=getAuxR();
+  document.getElementById('r-aux-lbl').textContent=R.toFixed(2)+' Ω';
+  document.getElementById('bdg2').textContent=R.toFixed(2)+' Ω';
+  updateChainDisplay();updateRgesDisplay();calc();
+}
+
+function calcKA(side){
+  const cross=document.getElementById('ka-'+side+'-cross').value;
+  document.getElementById('ka-'+side+'-ohm-wrap').style.display=cross==='cust'?'block':'none';
+  const R=getKAR(side);
+  document.getElementById('ka-'+side+'-r').textContent=R.toFixed(2)+' Ω';
+  document.getElementById('bdg3').textContent=(getKAR('a')||getKAR('b'))?'aktiv':'optional';
+  updateChainDisplay();updateRgesDisplay();calc();
+}
+function getKAR(side){
+  const cross=document.getElementById('ka-'+side+'-cross').value;
+  if(cross==='0') return 0;
+  if(cross==='cust') return parseFloat(document.getElementById('ka-'+side+'-ohm').value)||0;
+  return (RHO_CU/parseFloat(cross))*(parseFloat(document.getElementById('ka-'+side+'-len').value)||0);
+}
+
+function getRgesCalc(){return getKAR('a')+(getLen()*getRpm())+getKAR('b')+getRa();}
+function updateRgesDisplay(){
+  const Rc=getRgesCalc(),Rm=parseFloat(document.getElementById('rges-man').value)||0;
+  document.getElementById('rges-calc-lbl').textContent=Rc>0?fR4(Rc)+' Ω':'–';
+  document.getElementById('bdg4').textContent=Rc>0?fR4(Rc)+' Ω':'–';
+  if(Rm>0){
+    document.getElementById('rges-man-lbl').textContent=fR4(Rm)+' Ω';
+    const diff=Math.abs(Rc-Rm),pct=Rc>0?(diff/Rc*100):0;
+    const el=document.getElementById('rges-diff');el.style.display='block';
+    if(pct<=2){el.className='rges-diff ok';el.textContent=`Δ ${fR4(diff)} Ω (${pct.toFixed(1)}%) – konsistent`;}
+    else{el.className='rges-diff warn';el.textContent=`Δ ${fR4(diff)} Ω (${pct.toFixed(1)}%) – Abweichung prüfen`;}
+  } else {
+    document.getElementById('rges-man-lbl').textContent='–';
+    document.getElementById('rges-diff').style.display='none';
+  }
+}
+
+function checkSum(elId,a,b){
+  const el=document.getElementById(elId);
+  if(isNaN(a)||isNaN(b)){el.textContent='';el.className='sum-chk';return;}
+  const s=a+b,d=Math.abs(s-100);
+  if(d<=1.0){el.className='sum-chk ok';el.textContent=`✓ Summe: ${s.toFixed(1)} % – konsistent`;}
+  else if(d<=3.5){el.className='sum-chk wn';el.textContent=`⚠ Summe: ${s.toFixed(1)} % – geringe Abweichung`;}
+  else{el.className='sum-chk er';el.textContent=`✗ Summe: ${s.toFixed(1)} % – Messkreis prüfen`;}
+}
+
+function nd(cls,txt){return `<span class="ch-node ${cls}">${txt}</span>`;}
+function ar(){return `<span class="ch-arrow">▶</span>`;}
+function nassNode(){return `<span class="ch-node ch-nass">💧</span>`;}
+function row(lbl,nodes){
+  let h=`<div class="chain-row"><span class="ms-lbl">${lbl}</span>`;
+  nodes.forEach((n,i)=>{if(i>0)h+=ar();h+=n;});
+  return h+`</div>`;
+}
+
+function updateChainDisplay(){
+  const rkaA=getKAR('a'),rkaB=getKAR('b');
+  const sec2=isSec2Active();
+  const hasHFL=getAuxR()>0;
+  // Rückwegknoten: Abschnitt 2 hat Vorrang, danach HFL, sonst Warnung
+  const retNode = sec2
+    ? nd('ch-hfl','Abs.2 (RL)')
+    : nd('ch-hfl', hasHFL ? 'HFL' : 'HFL⚠');
+
+  // Fall 1: MKL rot → [KA-A] → Meldeader → 💧 → Meldeader → [KA-B] → MP-B → Rückweg → MKL blau
+  const f1=[nd('ch-mklr','MKL rot')];
+  if(rkaA>0)f1.push(nd('ch-ka','KA-A'));
+  f1.push(nd('ch-fw','Meldeader'),nassNode(),nd('ch-fw','Meldeader'));
+  if(rkaB>0)f1.push(nd('ch-ka','KA-B'));
+  f1.push(nd('ch-ka','MP-B'),retNode,nd('ch-mklb','MKL blau'));
+
+  // Fall 2: MKL rot → Rückweg → MP-B → [KA-B] → Meldeader → 💧 → Meldeader → [KA-A] → MKL blau
+  const f2=[nd('ch-mklr','MKL rot'),retNode,nd('ch-ka','MP-B')];
+  if(rkaB>0)f2.push(nd('ch-ka','KA-B'));
+  f2.push(nd('ch-fw','Meldeader'),nassNode(),nd('ch-fw','Meldeader'));
+  if(rkaA>0)f2.push(nd('ch-ka','KA-A'));
+  f2.push(nd('ch-mklb','MKL blau'));
+
+  // Fall 3: MKL rot → [KA-B] → Meldeader → 💧 → Meldeader → [KA-A] → MP-A → Rückweg → MKL blau
+  const f3=[nd('ch-mklr','MKL rot')];
+  if(rkaB>0)f3.push(nd('ch-ka','KA-B'));
+  f3.push(nd('ch-fw','Meldeader'),nassNode(),nd('ch-fw','Meldeader'));
+  if(rkaA>0)f3.push(nd('ch-ka','KA-A'));
+  f3.push(nd('ch-ka','MP-A'),retNode,nd('ch-mklb','MKL blau'));
+
+  // Fall 4: MKL rot → Rückweg → MP-A → [KA-A] → Meldeader → 💧 → Meldeader → [KA-B] → MKL blau
+  const f4=[nd('ch-mklr','MKL rot'),retNode,nd('ch-ka','MP-A')];
+  if(rkaA>0)f4.push(nd('ch-ka','KA-A'));
+  f4.push(nd('ch-fw','Meldeader'),nassNode(),nd('ch-fw','Meldeader'));
+  if(rkaB>0)f4.push(nd('ch-ka','KA-B'));
+  f4.push(nd('ch-mklb','MKL blau'));
+
+  document.getElementById('chain-a').innerHTML=row('Fall 1',f1)+row('Fall 2',f2);
+  document.getElementById('chain-b').innerHTML=row('Fall 3',f3)+row('Fall 4',f4);
+}
+
+function computeSet(Rt,suffix){
+  const L=getLen(),r=getRpm(),Ra=getRa(),Rka=getKAR('a'),Rkb=getKAR('b');
+  const pRA=parseFloat(document.getElementById('pRA').value);
+  const pBA=parseFloat(document.getElementById('pBA').value);
+  const pRB=parseFloat(document.getElementById('pRB').value);
+  const pBB=parseFloat(document.getElementById('pBB').value);
+
+  function xi(p,mode){
+    if(isNaN(p)||p<0||p>100) return null;
+    const f=p/100;
+    if(mode==='ra') return (f*Rt-Rka)/r;
+    if(mode==='ba') return L-(f*Rt-Ra-Rkb)/r;
+    if(mode==='rb') return L-(f*Rt-Rkb)/r;
+    if(mode==='bb') return (f*Rt-Ra-Rka)/r;
+  }
+  const x1=xi(pRA,'ra'),x2=xi(pBA,'ba'),x3=xi(pRB,'rb'),x4=xi(pBB,'bb');
+  const xs=[x1,x2,x3,x4];
+  const valid=xs.filter(x=>x!==null&&x>=-0.5&&x<=L+0.5);
+  if(valid.length===0) return false;
+
+  const mean=valid.reduce((a,b)=>a+b,0)/valid.length;
+  const maxD=Math.max(...valid.map(x=>Math.abs(x-mean)));
+  const sigma=Math.sqrt(valid.reduce((s,x)=>s+(x-mean)**2,0)/valid.length);
+
+  document.getElementById('rlbl-'+suffix).textContent='MP-B  '+fL(L)+' m';
+  buildRuler('ruler-'+suffix,'rleg-'+suffix,L,x1,x2,x3,x4,mean);
+
+  const COL=['#E74C3C','#3A8BBF','#27AE60','#D4AC0D'];
+  const LABS=['Fall 1 · x₁','Fall 2 · x₂','Fall 3 · x₃','Fall 4 · x₄'];
+  const pg=document.getElementById('pgrid-'+suffix);pg.innerHTML='';
+  xs.forEach((x,i)=>{
+    const c=document.createElement('div');c.className='pos-card';
+    if(x===null){
+      c.innerHTML=`<div class="pc-lbl"><span class="pc-dot" style="background:${COL[i]}"></span>${LABS[i]}</div><div class="pc-val" style="opacity:.35">–</div>`;
+    }else if(x<-0.5||x>L+0.5){
+      c.classList.add('oor');
+      c.innerHTML=`<div class="pc-lbl"><span class="pc-dot" style="background:${COL[i]}"></span>${LABS[i]}</div><div class="pc-val">${fL(x)} <span class="pc-unit">m</span></div><div class="pc-sub">ausserhalb</div>`;
+    }else{
+      const dv=valid.length>1?`<div class="pc-sub">Δ ${fL(Math.abs(x-mean))} m</div>`:'';
+      c.innerHTML=`<div class="pc-lbl"><span class="pc-dot" style="background:${COL[i]}"></span>${LABS[i]}</div><div class="pc-val">${fL(x)} <span class="pc-unit">m</span></div>${dv}`;
     }
+    pg.appendChild(c);
   });
-  entries.sort((a,b)=> a.kmr!==b.kmr ? a.kmr-b.kmr : a.dammIdx-b.dammIdx);
-  entries.forEach(e => {
-    const o = document.createElement('option');
-    // store both kmr and pipe index + dammIdx for exact lookup
-    o.value = JSON.stringify({kmr:e.kmr, pipeIdx:PIPE_TABLE.indexOf(e.pipe), dammIdx:e.dammIdx});
-    const dsStar = e.dammIdx===1 ? ' ★' : '';
-    o.textContent = `KMR ⌀${e.kmr}  Dämmstärke ${e.dammIdx+1}${dsStar}  DN${e.pipe[0]}`;
-    sel.appendChild(o);
-  });
-})();
 
-// ── State ─────────────────────────────────────────────────────────────────
-let activeSys='nordic', activeWire='cu-bare', activeDelta=DEFAULTS.delta;
-let activePipeD=null, activePipeRow=null, activeDammIdx=1, pipeMode='dn';
+  document.getElementById('mbox-'+suffix).innerHTML=
+    `<div><div class="ml">⌀ Nassposition ab MP-A</div><div class="mv">${fL(mean)} <span style="font-size:14px;color:rgba(255,255,255,.4)">m</span></div><div class="ms">${fL(L-mean)} m ab MP-B</div></div>
+     <div class="mr"><div class="ml">max. Δ</div><div class="sv">${fL(maxD)} <span style="font-size:12px;color:rgba(255,255,255,.4)">m</span></div><div class="ms">σ = ${fL(sigma)} m</div></div>`;
 
-// ── Pipe mode ─────────────────────────────────────────────────────────────
-function setPipeMode(mode){
-  pipeMode=mode; save('pipeMode',mode);
-  document.getElementById('pmode-dn').classList.toggle('on',  mode==='dn');
-  document.getElementById('pmode-kmr').classList.toggle('on', mode==='kmr');
-  document.getElementById('pipe-dn-wrap').style.display  = mode==='dn'  ? 'block':'none';
-  document.getElementById('pipe-kmr-wrap').style.display = mode==='kmr' ? 'block':'none';
-  if(mode==='dn') dnSelected(); else kmrSelected();
-}
-
-function dnSelected(){
-  const sel = document.getElementById('dn-select');
-  const opt = sel.options[sel.selectedIndex];
-  const idx = parseInt(opt.dataset.idx);
-  if(isNaN(idx)){ clearPipe(); return; }
-  const row = PIPE_TABLE[idx];
-  activePipeRow = row;
-  activePipeD   = row[1];
-  save('pipeDN', row[1]);
-  save('pipeRowIdx', idx);
-  document.getElementById('pipe-active-d').textContent   = row[1].toFixed(1)+' mm';
-  document.getElementById('pipe-active-wall').textContent= 'Wandstärke '+row[2]+' mm';
-  document.getElementById('pipe-active-lbl').textContent = 'DN '+row[0];
-  buildDammCards(row, parseInt(load('dammIdx_'+row[0], 1)));
-}
-
-function kmrSelected(){
-  const sel = document.getElementById('kmr-select');
-  const raw = sel.value;
-  if(!raw){ clearPipe(); return; }
-  let parsed;
-  try{ parsed=JSON.parse(raw); } catch(e){ clearPipe(); return; }
-  const {kmr, pipeIdx, dammIdx} = parsed;
-  const row = PIPE_TABLE[pipeIdx];
-  if(!row){ clearPipe(); return; }
-  activePipeRow = row;
-  activePipeD   = row[1];
-  save('pipeKMR', raw);
-  document.getElementById('pipe-active-d').textContent   = row[1].toFixed(1)+' mm';
-  document.getElementById('pipe-active-wall').textContent= 'Wandstärke '+row[2]+' mm';
-  document.getElementById('pipe-active-lbl').textContent = 'DN '+row[0]+' · KMR ⌀'+kmr;
-  buildDammCards(row, dammIdx);
-}
-
-function clearPipe(){
-  activePipeD=null; activePipeRow=null;
-  document.getElementById('pipe-active-d').textContent   = '—';
-  document.getElementById('pipe-active-wall').textContent= '';
-  document.getElementById('pipe-active-lbl').textContent = 'kein Typ gewählt';
-  document.getElementById('damm-section').style.display  = 'none';
-
-}
-
-// ── Dämmstärke cards ──────────────────────────────────────────────────────
-function buildDammCards(row, defaultIdx){
-  const cont = document.getElementById('damm-cards');
-  cont.innerHTML='';
-  for(let i=0;i<4;i++){
-    const [kmr, delta] = row[3+i];
-    const card = document.createElement('div');
-    card.className = 'damm-card' + (i===defaultIdx?' on':'');
-    card.innerHTML =
-      `<div class="dc-label">Dämmstärke ${i+1}</div>`+
-      `<div class="dc-val">δ ${delta} mm</div>`+
-      `<div class="dc-kmr">KMR ⌀${kmr}</div>`;
-    card.onclick = ()=>selectDamm(row, i);
-    cont.appendChild(card);
+  const ce=document.getElementById('cons-'+suffix),re=document.getElementById('rec-'+suffix);
+  let cls,icon,msg;
+  if(valid.length===1){cls='warn';icon='◑';msg='Nur 1 Messwert – keine Konsistenzprüfung.';}
+  else if(maxD<5){
+    cls='good';icon='✓';
+    msg=`<b>Nassstelle</b> · max. Δ ${fL(maxD)} m — punktförmig, Ortung zuverlässig.`;
+    re.style.display='none';
+  }else if(maxD<=10){
+    cls='warn';icon='⚠';
+    msg=`<b>Nasszone</b> · max. Δ ${fL(maxD)} m — ausgedehnte Feuchtigkeit, Messung wiederholen.`;
+    re.style.display='none';
+  }else{
+    cls='bad';icon='✗';
+    msg=`<b>Sondierungsgraben empfohlen</b> · max. Δ ${fL(maxD)} m — Messung nicht auflösbar.`;
+    re.style.display='block';
+    re.innerHTML=`<b>📍 Empfohlener Grabenmittelpunkt:</b><br>${fL(mean)} m ab MP-A · ${fL(L-mean)} m ab MP-B<br>
+      <small>Graben öffnet Schleife → Neuaufteilung in 2 Abschnitte möglich.</small>`;
   }
-  document.getElementById('damm-section').style.display='block';
-
-  selectDamm(row, defaultIdx);
+  ce.className='cons '+cls;ce.innerHTML=`<span class="ci">${icon}</span>${msg}`;
+  return {x1,x2,x3,x4,mean,maxD,sigma,fromB:L-mean};
 }
 
-function selectDamm(row, idx){
-  // Updates damm card highlight AND moves slider to match – slider does not affect cards
-  activeDammIdx = idx;
-  if(row) save('dammIdx_'+row[0], idx);
-  const delta = row[3+idx][1];
-  setDeltaValue(delta);
-  document.querySelectorAll('.damm-card').forEach((c,i)=>c.classList.toggle('on',i===idx));
-}
-
-// ── Delta – fully decoupled from damm cards ────────────────────────────────
-function setDeltaValue(v){
-  activeDelta=v; save('delta',v);
-  document.getElementById('delta-disp').textContent=parseFloat(v).toFixed(1);
-  document.getElementById('delta-range').value=v;
-}
-function deltaSlide(v){
-  const val=parseFloat(v); activeDelta=val; save('delta',val);
-  document.getElementById('delta-disp').textContent=val.toFixed(1);
-}
-
-// ── Wire ──────────────────────────────────────────────────────────────────
-function getWireD(w){
-  const v=parseFloat(document.getElementById(WIRE_PROFILES[w].dKey).value);
-  return v>0?v:WIRE_PROFILES[w].dNominal;
-}
-function refreshDDisplay(){} // display row removed
-const WIRE_PROFILES={
-  'cu-bare': {label:'Nordic Cu blank',               dKey:'s-cu-bare-d', dNominal:1.380},
-  'cu-tin':  {label:'Nordic Cu/Sn verzinnt',         dKey:'s-cu-tin-d',  dNominal:1.380},
-  'nicr-res':{label:'Brandes NiCr 80/20', dKey:'s-nicr-res-d',dNominal:0.490},
-  'nicr-ret':{label:'Brandes Cu Rückführader',       dKey:'s-nicr-ret-d',dNominal:0.790},
-  'ka':      {label:'KA · Cu',                         dKey:'s-ka-d',       dNominal:1.200}
-};
-
-function setSys(sys){
-  activeSys=sys; save('sys',sys);
-  document.getElementById('sys-nordic').classList.toggle('on',  sys==='nordic');
-  document.getElementById('sys-brandes').classList.toggle('on', sys==='brandes');
-  document.getElementById('sys-ka').classList.toggle('on',      sys==='ka');
-  document.getElementById('wires-nordic').style.display  = sys==='nordic'  ?'block':'none';
-  document.getElementById('wires-brandes').style.display = sys==='brandes' ?'block':'none';
-  document.getElementById('ka-panel').style.display      = sys==='ka'      ?'block':'none';
-  if(sys==='ka') { setWire('ka'); calcKaOffset(); }
-  else setWire(sys==='nordic'?'cu-bare':'nicr-res');
-}
-function setWire(w){
-  activeWire=w; save('wire',w);
-  ['cu-bare','cu-tin','nicr-res','nicr-ret','ka'].forEach(id=>{
-    const el=document.getElementById('w-'+id); if(el) el.classList.toggle('on',id===w);
-  });
-  refreshDDisplay();
-}
-
-function setEps(v){
-  document.getElementById('s-eps').value=v;
-  updateEpsBadge();
-  updateEpsBtns();
-}
-function updateEpsBadge(){
-  const v=parseFloat(document.getElementById('s-eps').value)||1.2;
-  document.getElementById('eps-badge').textContent='εᵣ '+v.toFixed(2);
-}
-function updateEpsBtns(){
-  const v=parseFloat(document.getElementById('s-eps').value)||1.2;
-  document.querySelectorAll('.eps-btn').forEach(b=>{
-    const bv=parseFloat(b.dataset.eps);
-    const on=Math.abs(bv-v)<0.001;
-    b.style.background = on ? 'var(--accent-bg)' : 'var(--color-bg)';
-    b.style.borderColor = on ? 'var(--accent)'    : 'var(--color-border-md)';
-    b.style.color       = on ? 'var(--accent-text)': 'var(--color-text-secondary)';
-  });
-}
-function arcosh(x){return Math.log(x+Math.sqrt(x*x-1));}
-
-// ── Calc ──────────────────────────────────────────────────────────────────
 function calc(){
-  if(activeSys==='ka') return;
-  const D_mm=activePipeD, d_mm=getWireD(activeWire);
-  const C_meas=parseFloat(document.getElementById('c-meas').value);
-  const memo1Val = parseFloat(document.getElementById('c-memo').value);
-  const memo2Val = parseFloat(document.getElementById('c-memo2').value);
-  const hasMemo1 = !isNaN(memo1Val) && document.getElementById('c-memo').value!=='';
-  const hasMemo2 = !isNaN(memo2Val) && document.getElementById('c-memo2').value!=='';
-  // Base offset: Merk1 replaces Eichwert if set, otherwise use Eichwert
-  const baseOff = hasMemo1 ? memo1Val : (parseFloat(document.getElementById('c-off').value)||0);
-  // Merk2 subtracts additionally (raw pF, no eichwert)
-  const memo2Off = hasMemo2 ? memo2Val : 0;
-  const C_off = baseOff + memo2Off;
-  const usingMemo = hasMemo1 || hasMemo2;
-  const epsR  =parseFloat(document.getElementById('s-eps').value)||1.2;
-  const kCal  =parseFloat(document.getElementById('s-kcal').value)||1.0;
-  const kMan  =parseFloat(document.getElementById('s-kman').value)||1.0;
-  const unit  =document.getElementById('s-unit').value;
-  const rlen=document.getElementById('r-len'), ralt=document.getElementById('r-alt'), rdetail=document.getElementById('r-detail');
-  document.getElementById('w-neg').style.display=(C_meas>0&&C_meas<=C_off)?'block':'none';
-  if(!D_mm||D_mm<=0){rlen.innerHTML='—<span class="runit"> m</span>';ralt.textContent='';rdetail.textContent='';return;}
-  if(!C_meas||C_meas<=0){rlen.innerHTML='—<span class="runit"> m</span>';ralt.textContent='';rdetail.textContent='';return;}
-  const C_net_pF=(C_meas-C_off)*kCal*kMan;
-  if(C_net_pF<=0){rlen.innerHTML='<span style="font-size:16px">C_netto ≤ 0</span>';ralt.textContent='';rdetail.textContent='Eichwert korrigieren';return;}
-  const R=D_mm/2/1000, r=d_mm/2/1000, e=R+activeDelta/1000+r;
-  const arg=(R*R+r*r-e*e)/(2*R*r);
-  if(arg>-1){rlen.innerHTML='<span style="font-size:16px">Geometriefehler</span>';ralt.textContent='';rdetail.textContent='arcosh > −1  arg='+arg.toFixed(4)+'\nδ oder D prüfen';return;}
-  const ac=arcosh(-arg);
-  const C_per_m=(2*Math.PI*EPS0*epsR)/ac;
-  const L_m=(C_net_pF*1e-12)/C_per_m;
-  let disp,altVal;
-  if(unit==='km'){disp=(L_m/1000).toFixed(3)+'<span class="runit"> km</span>';altVal='= '+L_m.toFixed(1)+' m';}
-  else{disp=L_m.toFixed(1)+'<span class="runit"> m</span>';altVal='= '+(L_m/1000).toFixed(3)+' km';}
-  rlen.innerHTML=disp; ralt.textContent=altVal;
+  updateRMain();updateChainDisplay();updateRgesDisplay();
+  const L=getLen(),r=getRpm();
+  const pRA=parseFloat(document.getElementById('pRA').value);
+  const pBA=parseFloat(document.getElementById('pBA').value);
+  const pRB=parseFloat(document.getElementById('pRB').value);
+  const pBB=parseFloat(document.getElementById('pBB').value);
 
-  // Memo result boxes: show frozen values
-  updateMemoStyle();
-  updateMemo2ResultBox(C_per_m, unit);
-  const dammStr = activePipeRow ? `  DS${activeDammIdx+1} · KMR ⌀${activePipeRow[3+activeDammIdx][0]}` : '';
-  rdetail.textContent=
-    WIRE_PROFILES[activeWire].label+'  ·  δ='+activeDelta+' mm  ·  εᵣ='+epsR+dammStr+(hasMemo1&&hasMemo2?' · Merk1+Merk2 aktiv':hasMemo1?' · Merk1 aktiv':hasMemo2?' · Merk2 aktiv':'')+'\n'+
-    'C_netto='+C_net_pF.toFixed(0)+' pF  ·  arcosh='+ac.toFixed(5)+'\n'+
-    'R='+(R*1000).toFixed(1)+' mm  r='+(r*1000).toFixed(3)+' mm  e='+(e*1000).toFixed(2)+' mm';
-  document.getElementById('fbox').textContent=
-    'C_netto=('+C_meas+'−'+C_off+')×'+kCal.toFixed(3)+'×'+kMan.toFixed(3)+'='+C_net_pF.toFixed(1)+
-    ' pF  ·  C/m='+C_per_m.toFixed(4)+'e-12 F/m';
-  document.getElementById('res-card').scrollIntoView({behavior:'smooth',block:'nearest'});
+  checkSum('sum-a',pRA,pBA);checkSum('sum-b',pRB,pBB);
+
+  const Rc=getRgesCalc();
+  const anyVal=[pRA,pBA,pRB,pBB].some(v=>!isNaN(v));
+  if(!L||!r||!Rc||!anyVal){showEmpty();return;}
+
+  const Rm=parseFloat(document.getElementById('rges-man').value)||0;
+  const Ra=getRa();
+
+  // Chips
+  document.getElementById('chips').innerHTML=
+    `<div class="chip">R<sub>ges</sub> = <b>${fR4(Rc)} Ω</b></div>`+
+    (getAuxR()>0?`<div class="chip">R<sub>HFL</sub> = <b>${getAuxR().toFixed(2)} Ω</b></div>`:'')+
+    (isSec2Active()?`<div class="chip">R<sub>Abs.2</sub> = <b>${fR4(getSec2R())} Ω</b></div>`:'')+
+    (getKAR('a')?`<div class="chip">KA-A = <b>${getKAR('a').toFixed(2)} Ω</b></div>`:'')+
+    (getKAR('b')?`<div class="chip">KA-B = <b>${getKAR('b').toFixed(2)} Ω</b></div>`:'')+
+    `<div class="chip">L = <b>${fL(L)} m</b></div>`;
+
+  document.getElementById('no-res').style.display='none';
+  document.getElementById('res-content').style.display='block';
+
+  computeSet(Rc,'calc');
+
+  const tabs=document.getElementById('res-tabs');
+  if(Rm>0){tabs.style.display='flex';computeSet(Rm,'man');}
+  else{tabs.style.display='none';if(activeTab==='man')switchTab('calc');}
 }
 
-// ── Settings ──────────────────────────────────────────────────────────────
-function saveMemo1(){
-  const c = document.getElementById('c-meas').value;
-  if(!c){ return; }
-  document.getElementById('c-memo').value = c;
-  save('c-memo', c);
-  const frozenLen = calcMemoLength(true);
-  const unit = document.getElementById('s-unit').value;
-  let display = '—';
-  if(frozenLen !== null){
-    display = unit==='km' ? (frozenLen/1000).toFixed(3)+' km' : frozenLen.toFixed(1)+' m';
-  }
-  save('memo-frozen-len', display);
-  updateMemoStyle();
-}
-function saveMemo2(){
-  // Merk2: stores C_meas raw (exkl. Eichwert – pure capacitance value)
-  const c = document.getElementById('c-meas').value;
-  if(!c){ return; }
-  document.getElementById('c-memo2').value = c;
-  save('c-memo2', c);
-  const frozenLen = calcMemoLength(false);
-  const unit = document.getElementById('s-unit').value;
-  let display = '—';
-  if(frozenLen !== null){
-    display = unit==='km' ? (frozenLen/1000).toFixed(3)+' km' : frozenLen.toFixed(1)+' m';
-  }
-  save('memo2-frozen-len', display);
-  updateMemo2Style();
-}
-function calcMemoLength(inclEichwert){
-  const D_mm = activePipeD;
-  const d_mm = getWireD(activeWire);
-  const C_meas = parseFloat(document.getElementById('c-meas').value);
-  const C_off  = inclEichwert ? (parseFloat(document.getElementById('c-off').value)||0) : 0;
-  const epsR   = parseFloat(document.getElementById('s-eps').value)||1.2;
-  const kCal   = parseFloat(document.getElementById('s-kcal').value)||1.0;
-  const kMan   = parseFloat(document.getElementById('s-kman').value)||1.0;
-  if(!D_mm||!C_meas) return null;
-  const C_net_pF = (C_meas - C_off)*kCal*kMan;
-  if(C_net_pF<=0) return null;
-  const R=D_mm/2/1000, r=d_mm/2/1000, e=R+activeDelta/1000+r;
-  const arg=(R*R+r*r-e*e)/(2*R*r);
-  if(arg>-1) return null;
-  const ac=Math.log(-arg+Math.sqrt(arg*arg-1));
-  const C_per_m=(2*Math.PI*EPS0*epsR)/ac;
-  return (C_net_pF*1e-12)/C_per_m;
-}
-function clearMemo1(){
-  document.getElementById('c-memo').value='';
-  localStorage.removeItem('c-memo');
-  localStorage.removeItem('memo-frozen-len');
-  updateMemoStyle();
-}
-function clearMemo2(){
-  document.getElementById('c-memo2').value='';
-  localStorage.removeItem('c-memo2');
-  localStorage.removeItem('memo2-frozen-len');
-  updateMemo2Style();
-}
-function updateMemoStyle(){
-  const el = document.getElementById('c-memo');
-  const hasVal = el.value !== '';
-  el.classList.toggle('memo-active', hasVal);
-  const box = document.getElementById('memo-result-box');
-  box.classList.toggle('memo-on', hasVal);
-  if(hasVal){
-    const frozen = load('memo-frozen-len','—');
-    const parts = frozen.split(' ');
-    document.getElementById('memo-result-val').textContent = parts[0]||'—';
-    document.getElementById('memo-result-unit').textContent = parts[1]||'m';
-  } else {
-    document.getElementById('memo-result-val').textContent='—';
-    document.getElementById('memo-result-unit').textContent='m';
-  }
-  save('c-memo', el.value);
-}
-function updateMemo2Style(){
-  const el = document.getElementById('c-memo2');
-  const hasVal = el.value !== '';
-  el.classList.toggle('memo-active', hasVal);
-  const box = document.getElementById('memo2-result-box');
-  box.classList.toggle('memo-on', hasVal);
-  if(hasVal){
-    const frozen = load('memo2-frozen-len','—');
-    const parts = frozen.split(' ');
-    document.getElementById('memo2-result-val').textContent = parts[0]||'—';
-    document.getElementById('memo2-result-unit').textContent = parts[1]||'m';
-  } else {
-    document.getElementById('memo2-result-val').textContent='—';
-    document.getElementById('memo2-result-unit').textContent='m';
-  }
-  save('c-memo2', el.value);
-}
-function updateMemo2ResultBox(C_per_m, unit){
-  const memo2 = document.getElementById('c-memo2').value;
-  const box = document.getElementById('memo2-result-box');
-  if(!memo2 || !C_per_m){ box.classList.remove('memo-on'); document.getElementById('memo2-result-val').textContent='—'; return; }
-  box.classList.add('memo-on');
-  const frozen = load('memo2-frozen-len','—');
-  const parts = frozen.split(' ');
-  document.getElementById('memo2-result-val').textContent = parts[0]||'—';
-  document.getElementById('memo2-result-unit').textContent = parts[1]||'m';
-}
-// ── KA Offset Calculation ─────────────────────────────────────────────────
-// Center-to-center distances for Cu/SMPE 4x2x0.8mm (8 non-twisted wires in circle)
-// Shield inner D=7.5mm, wire centre radius ~2.85mm
-// Benachbart (45°): 2.18mm  Übernächst (90°): 4.03mm  Gegenüber (180°): 5.7mm
-const KA_D_POSITIONS = [2.18, 4.03, 5.7];
-// Solid Cu wire diameters: d = sqrt(4*A/π)
-const KA_CS = [
-  {label:'0,5 mm²', A:0.5, d: 0.800},  // Cu/SMPE 4x2x0.8mm: nominal d=0.800mm
-  {label:'1,0 mm²', A:1.0, d: Math.sqrt(4*1.0/Math.PI)},  // 1.128 mm
-  {label:'1,5 mm²', A:1.5, d: Math.sqrt(4*1.5/Math.PI)},  // 1.382 mm
-];
-// Screened twisted pair constants for Cu/SMPE/VAS/FOL/AL+PE 4x2x0.8mm
-const KA_SHIELD_D = 7.5;   // shield inner diameter mm (11.5 - 2*1.75 - 2*0.25)
-const KA_EPS_R   = 2.3;    // SMPE/XLPE insulation
-let kaPos = 1;
-let kaCs  = 0;
-
-function setKaCs(idx){
-  kaCs = idx; save('ka-cs', idx);
-  [0,1,2].forEach(i => document.getElementById('ka-cs-'+i).classList.toggle('on', i===idx));
-  calcKaOffset();
-}
-function setKaPos(idx){
-  kaPos = idx; save('ka-pos', idx);
-  [0,1,2].forEach(i => document.getElementById('ka-pos-'+i).classList.toggle('on', i===idx));
-  calcKaOffset();
+function showEmpty(){
+  document.getElementById('no-res').textContent='Leitungsdaten und Messwerte eingeben.';
+  document.getElementById('no-res').style.display='block';
+  document.getElementById('res-content').style.display='none';
 }
 
-// Measured KA cable constants (Cu/SMPE 4x2x0.8mm, netto after eichwert)
-// Measured on 5m sample, eichwert 10pF already subtracted
-const KA_C_PER_M = [43.0, 40.5, 38.0]; // pF/m: Benachbart, Übernächst, Gegenüber (gemessen)
-
-function calcKaOffset(){
-  const len = parseFloat(document.getElementById('ka-len').value);
-  if(!len || len<=0){ document.getElementById('ka-offset-pf').textContent='—'; document.getElementById('ka-offset-detail').textContent=''; return; }
-  const C_per_m_pF = KA_C_PER_M[kaPos];
-  const C_total_pF = C_per_m_pF * len;
-  const offVal = Math.round(C_total_pF);
-  document.getElementById('ka-offset-pf').textContent = offVal;
-  document.getElementById('ka-offset-detail').textContent = '– ' + C_per_m_pF.toFixed(1) + ' pF/m';
-  save('ka-len', len);
-}
-
-function kaToMemo2(){
-  // Only transfer when KA tab is active
-  if(activeSys !== 'ka') { setSys('ka'); return; }
-  const offset = document.getElementById('ka-offset-pf').textContent;
-  if(!offset || offset==='—') return;
-  document.getElementById('c-memo2').value = offset;
-  save('c-memo2', offset);
-  // Store KA cable length for Abgang 2 display
-  const kaLen = document.getElementById('ka-len').value;
-  if(kaLen) {
-    save('memo2-frozen-len', kaLen+' m');
-    updateMemo2Style();
-  } else {
-    updateMemo2Style();
-  }
-}
-function openS(){document.getElementById('smod').classList.add('open');}
-function applyAndClose(){
-  saveSettings();
-  document.getElementById('c-off').value=document.getElementById('s-eich').value;
-  refreshDDisplay();
-  updateEpsBadge();
-  updateEpsBtns();
-  closeS();
-}
-function closeS(){document.getElementById('smod').classList.remove('open');}
-function resetS(){
-  document.getElementById('s-eps').value        = DEFAULTS.eps;
-  document.getElementById('s-cu-bare-d').value  = DEFAULTS.cuBareD;
-  document.getElementById('s-cu-tin-d').value   = DEFAULTS.cuTinD;
-  document.getElementById('s-nicr-res-d').value = DEFAULTS.nicrResD;
-  document.getElementById('s-nicr-ret-d').value = DEFAULTS.nicrRetD;
-  document.getElementById('s-eich').value       = DEFAULTS.eich;
-  document.getElementById('s-kcal').value       = DEFAULTS.kcal;
-  document.getElementById('s-kman').value       = DEFAULTS.kman;
-  document.getElementById('s-unit').value       = DEFAULTS.unit;
-  refreshDDisplay();
-}
-document.getElementById('smod').addEventListener('click',function(e){if(e.target===this)closeS();});
-
-// ── Init ──────────────────────────────────────────────────────────────────
-(function init(){
-  loadSettings();
-  updateEpsBadge();
-  updateEpsBtns();
-
-  // Delta (will be overridden by pipe selection if available)
-  const savedDelta = parseFloat(load('delta', DEFAULTS.delta));
-  setDeltaValue(savedDelta);
-
-  // System + wire
-  const savedSys  = load('sys',  DEFAULTS.sys);
-  const savedWire = load('wire', DEFAULTS.wire);
-  activeSys=savedSys;
-  document.getElementById('sys-nordic').classList.toggle('on',  savedSys==='nordic');
-  document.getElementById('sys-brandes').classList.toggle('on', savedSys==='brandes');
-  document.getElementById('sys-ka').classList.toggle('on',      savedSys==='ka');
-  document.getElementById('ka-panel').style.display = savedSys==='ka' ? 'block':'none';
-  kaCs  = parseInt(load('ka-cs','0'));
-  [0,1,2].forEach(i => document.getElementById('ka-cs-'+i).classList.toggle('on', i===kaCs));
-  kaPos = parseInt(load('ka-pos','1'));
-  [0,1,2].forEach(i => document.getElementById('ka-pos-'+i).classList.toggle('on', i===kaPos));
-  // ka-len intentionally left empty on startup
-  // Set default ka-len if empty
-  if(!document.getElementById('ka-len').value) document.getElementById('ka-len').value='5';
-  if(savedSys==='ka') calcKaOffset();
-  document.getElementById('wires-nordic').style.display  = savedSys==='nordic'  ?'block':'none';
-  document.getElementById('wires-brandes').style.display = savedSys==='brandes' ?'block':'none';
-  activeWire=savedWire;
-  ['cu-bare','cu-tin','nicr-res','nicr-ret','ka'].forEach(id=>{
-    const el=document.getElementById('w-'+id); if(el) el.classList.toggle('on',id===savedWire);
+function buildRuler(rid,lid,L,x1,x2,x3,x4,mean){
+  const ruler=document.getElementById(rid);
+  ruler.querySelectorAll('.r-mark').forEach(m=>m.remove());
+  const COL=['#E74C3C','#3A8BBF','#27AE60','#D4AC0D'];
+  [x1,x2,x3,x4].forEach((x,i)=>{
+    if(x===null||x<0||x>L) return;
+    const m=document.createElement('div');m.className='r-mark m'+(i+1);
+    m.style.cssText=`left:${(x/L*100).toFixed(2)}%;background:${COL[i]}`;ruler.appendChild(m);
   });
-  refreshDDisplay();
+  if(!isNaN(mean)&&mean>=0&&mean<=L){
+    const m=document.createElement('div');m.className='r-mark m-mean';
+    m.style.left=(mean/L*100).toFixed(2)+'%';ruler.appendChild(m);
+  }
+  document.getElementById(lid).innerHTML=
+    ['Fall 1','Fall 2','Fall 3','Fall 4','⌀ Mittel'].map((n,i)=>
+      `<div class="rl-item"><span class="rl-dot" style="background:${[...COL,'#fff'][i]}"></span>${n}</div>`
+    ).join('');
+}
 
-  // Pipe mode + selection
-  const savedPipeMode = load('pipeMode', DEFAULTS.pipeMode);
-  pipeMode=savedPipeMode;
-  document.getElementById('pmode-dn').classList.toggle('on',  savedPipeMode==='dn');
-  document.getElementById('pmode-kmr').classList.toggle('on', savedPipeMode==='kmr');
-  document.getElementById('pipe-dn-wrap').style.display  = savedPipeMode==='dn'  ?'block':'none';
-  document.getElementById('pipe-kmr-wrap').style.display = savedPipeMode==='kmr' ?'block':'none';
+// ═══ PDF ═══════════════════════════════════════════════
+function exportPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,M=18;let y=M;
 
-  if(savedPipeMode==='dn'){
-    const savedDN = parseFloat(load('pipeDN', DEFAULTS.pipeDN));
-    const sel = document.getElementById('dn-select');
-    for(let i=0;i<sel.options.length;i++){
-      if(parseFloat(sel.options[i].value)===savedDN){ sel.selectedIndex=i; break; }
-    }
-    dnSelected();
-  } else {
-    const savedKMR = load('pipeKMR','');
-    if(savedKMR){
-      const sel=document.getElementById('kmr-select');
-      for(let i=0;i<sel.options.length;i++){
-        if(sel.options[i].value===savedKMR){ sel.selectedIndex=i; break; }
-      }
-      kmrSelected();
+  const dk=()=>doc.setTextColor(28,43,58);
+  const gr=()=>doc.setTextColor(90,104,128);
+  const wh=()=>doc.setTextColor(255,255,255);
+  const ln=(h=6)=>{y+=h;};
+  const hl=()=>{doc.setDrawColor(216,220,229);doc.setLineWidth(0.3);doc.line(M,y,W-M,y);ln(4);};
+  const sec=(t)=>{
+    ln(3);doc.setFillColor(27,61,94);doc.rect(M,y,W-2*M,7,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);wh();doc.text(t,M+3,y+5);ln(10);dk();
+  };
+  const rw=(l,v,u='')=>{
+    gr();doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text(l,M,y);
+    dk();doc.setFont('helvetica','bold');doc.text((v||'–')+(u?' '+u:''),M+75,y);ln(6);
+  };
+
+  // Header
+  doc.setFillColor(27,61,94);doc.rect(0,0,W,28,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(16);wh();doc.text('TipScale · Naesse-Ortung',M,14);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(180,200,220);
+  doc.text('Widerstands-Referenz-Messverfahren · LUWA · Fernwaerme',M,20);
+  const now=new Date();
+  doc.text(now.toLocaleDateString('de-DE')+' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}),W-M,20,{align:'right'});
+  y=36;
+
+  // Projekt
+  sec('PROJEKT & IDENTIFIKATION');
+  rw('Kunde / Projekt',document.getElementById('proj-name').value||'–');
+  rw('Leitungs-ID / Messabschnitt',document.getElementById('proj-lid').value||'–');
+
+  // Topologie-Skizze
+  sec('TOPOLOGIE DER MESSSCHLEIFE');
+  const rkaA=getKAR('a'),rkaB=getKAR('b'),Ra=getAuxR();
+  const hasKAA=rkaA>0,hasKAB=rkaB>0,hasHFL=Ra>0;
+
+  function tn(x,yy,txt,active,col){
+    const nw=24,nh=8;
+    doc.setFillColor(...(active?(col||[27,61,94]):[220,225,232]));
+    doc.roundedRect(x,yy,nw,nh,1.5,1.5,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(6.5);
+    doc.setTextColor(...(active?[255,255,255]:[160,170,185]));
+    doc.text(txt,x+nw/2,yy+nh/2+0.5,{align:'center',baseline:'middle'});
+    // Inaktive Nodes: 2 diagonale Kreuze
+    if(!active){
+      doc.setDrawColor(140,150,160);doc.setLineWidth(0.4);
+      doc.line(x+1,yy+1,x+nw-1,yy+nh-1);
+      doc.line(x+nw-1,yy+1,x+1,yy+nh-1);
     }
   }
+  function tl(x1,y1,x2,y2,active){
+    doc.setDrawColor(...(active?[27,61,94]:[210,215,225]));
+    doc.setLineWidth(active?0.6:0.3);doc.line(x1,y1,x2,y2);
+  }
 
-  document.getElementById('c-off').value = document.getElementById('s-eich').value;
-  const savedMemo = load('c-memo','');
-  if(savedMemo){ document.getElementById('c-memo').value=savedMemo; }
-  updateMemoStyle();
-  const savedMemo2 = load('c-memo2','');
-  if(savedMemo2){ document.getElementById('c-memo2').value=savedMemo2; }
-  updateMemo2Style();
-})();
+  const sy=y,sx=M;
+  const nw=24; // node width — single source of truth
+  const tNodes=[
+    {x:sx,       t:'MP-A',  a:true,   c:[27,61,94]},
+    {x:sx+32,    t:'KA-A',  a:hasKAA, c:[192,57,43]},
+    {x:sx+66,    t:'Meld.', a:true,   c:[26,95,168]},
+    {x:sx+102,   t:'KA-B',  a:hasKAB, c:[26,95,168]},
+    {x:sx+136,   t:'MP-B',  a:true,   c:[27,61,94]},
+  ];
+  tNodes.forEach((n,i)=>{
+    tn(n.x,sy,n.t,n.a,n.c);
+    if(i<tNodes.length-1) tl(n.x+nw,sy+4,tNodes[i+1].x,sy+4,n.a&&tNodes[i+1].a);
+  });
+
+  // Nassmarker: kleiner roter Kreis zwischen Nodes 2 und 3 (auf Verbindungslinie)
+  const nassX = sx+66 + nw/2; // Mitte von Meld.-Node
+  doc.setFillColor(192,57,43);
+  doc.circle(nassX, sy+4, 2.5, 'F');
+  doc.setDrawColor(255,255,255);doc.setLineWidth(0.5);
+  doc.circle(nassX, sy+4, 2.5, 'S');
+
+  // HFL-Bogen: symmetrisch — beide Streben an der Mitte der Endnodes
+  const hy=sy+19;
+  const hflLeft  = sx + nw/2;           // Mitte MP-A
+  const hflRight = sx+136 + nw/2;       // Mitte MP-B
+  const hflNodeW = 24, hflNodeH = 8;
+  const hflNodeX = (hflLeft+hflRight)/2 - hflNodeW/2; // HFL-Node zentriert
+  tl(hflLeft, sy+8, hflLeft, hy, hasHFL);             // linke Strebe
+  tl(hflLeft, hy, hflRight, hy, hasHFL);              // Querbalken
+  tl(hflRight, hy, hflRight, sy+8, hasHFL);           // rechte Strebe
+  tn(hflNodeX, hy-4, 'HFL', hasHFL,[26,118,78]);
+  // Legende
+  ln(24);
+  doc.setFontSize(7);
+  doc.setFillColor(27,61,94);doc.rect(M,y,4,4,'F');doc.setTextColor(27,61,94);doc.text('Aktiver Teilnehmer',M+6,y+3);
+  doc.setFillColor(220,225,232);doc.rect(M+58,y,4,4,'F');doc.setTextColor(160,170,185);doc.text('Inaktiv / nicht konfiguriert',M+64,y+3);
+  ln(8);hl();
+
+  // Leitungsabschnitt
+  sec('LEITUNGSABSCHNITT & MELDEADER');
+  const wt=document.getElementById('wire-type').value;
+  rw('Abschnitt 1 · Meldeader',WIRE_NAME[wt]);
+  const T=parseFloat(document.getElementById('temp-op').value);
+  rw('Betriebstemperatur Abs. 1',isNaN(T)?'20 (Referenz)':T.toFixed(0),'°C');
+  rw('r Abs. 1 (korrigiert)',fR4(getRpm()),'Ω/m');
+  rw('Gesamtlänge',fL(getLen()),'m');
+  rw('R Abschnitt 1 gesamt',fR4(getLen()*getRpm()),'Ω');
+  if(isSec2Active()){
+    const wt2=document.getElementById('wire-type2').value;
+    const T2=parseFloat(document.getElementById('temp-op2').value);
+    rw('Abschnitt 2 · Meldeader (RL)',WIRE_NAME[wt2]);
+    rw('Betriebstemperatur Abs. 2',isNaN(T2)?'20 (Referenz)':T2.toFixed(0),'°C');
+    rw('r Abs. 2 (korrigiert)',fR4(getRpm2()),'Ω/m');
+    rw('Länge Abschnitt 2',fL(getLen2()),'m');
+    rw('R Abschnitt 2 gesamt',fR4(getSec2R()),'Ω');
+  }
+
+  // HFL & KA
+  sec('HILFSLEITUNGEN & KABELAUSFÜHRUNGEN');
+  rw('R HFL total',getAuxR().toFixed(2),'Ω');
+  if(isSec2Active()) rw('R Abschnitt 2 Rückführung',fR4(getSec2R()),'Ω');
+  rw('R Rückführung total',fR4(getRa()),'Ω');
+  rw('R KA-A',getKAR('a').toFixed(2),'Ω');
+  rw('R KA-B',getKAR('b').toFixed(2),'Ω');
+  rw('R ges (berechnet)',fR4(getRgesCalc()),'Ω');
+  const Rm=parseFloat(document.getElementById('rges-man').value)||0;
+  if(Rm>0) rw('R ges (manuell gemessen)',fR4(Rm),'Ω');
+
+  // Messwerte
+  sec('MESSWERTE — Brückenabgleich (%)');
+  const pRA=parseFloat(document.getElementById('pRA').value);
+  const pBA=parseFloat(document.getElementById('pBA').value);
+  const pRB=parseFloat(document.getElementById('pRB').value);
+  const pBB=parseFloat(document.getElementById('pBB').value);
+  rw('Fall 1 · MP-A · MKL rot → Meldeader',isNaN(pRA)?'–':pRA.toFixed(2),'%');
+  rw('Fall 2 · MP-A · MKL rot → HFL',isNaN(pBA)?'–':pBA.toFixed(2),'%');
+  rw('Fall 3 · MP-B · MKL rot → Meldeader',isNaN(pRB)?'–':pRB.toFixed(2),'%');
+  rw('Fall 4 · MP-B · MKL rot → HFL',isNaN(pBB)?'–':pBB.toFixed(2),'%');
+
+  // Ergebnisfunktion
+  function writeRes(Rt,label){
+    sec('ERGEBNIS — '+label.toUpperCase());
+    const L=getLen(),r=getRpm(),Ra=getRa(),Rka=getKAR('a'),Rkb=getKAR('b');
+    function xi(p,mode){
+      if(isNaN(p)||p<0||p>100) return null;const f=p/100;
+      if(mode==='ra') return (f*Rt-Rka)/r;
+      if(mode==='ba') return L-(f*Rt-Ra-Rkb)/r;
+      if(mode==='rb') return L-(f*Rt-Rkb)/r;
+      if(mode==='bb') return (f*Rt-Ra-Rka)/r;
+    }
+    const xs=[xi(pRA,'ra'),xi(pBA,'ba'),xi(pRB,'rb'),xi(pBB,'bb')];
+    const valid=xs.filter(x=>x!==null&&x>=-0.5&&x<=L+0.5);
+    if(!valid.length){rw('Ergebnis','Keine gültigen Werte');return;}
+    const mean=valid.reduce((a,b)=>a+b,0)/valid.length;
+    const maxD=Math.max(...valid.map(x=>Math.abs(x-mean)));
+    xs.forEach((x,i)=>rw(`x${i+1} (Fall ${i+1})`,x!==null?fL(x):'–','m ab MP-A'));
+    rw('⌀ Nassposition ab MP-A',fL(mean),'m');
+    rw('Nassposition ab MP-B',fL(L-mean),'m');
+    rw('max. Δ zwischen Messungen',fL(maxD),'m');
+    let diag=maxD<5?'Nassstelle (< 5 m)':maxD<=10?'Nasszone (5–10 m)':'Sondierungsgraben empfohlen (> 10 m)';
+    rw('Diagnose',diag);
+    if(maxD>10) rw('Empf. Grabenmittelpunkt',fL(mean)+' m / '+fL(L-mean)+' m ab MP-B');
+  }
+
+  writeRes(getRgesCalc(),'R ges berechnet');
+  if(Rm>0) writeRes(Rm,'R ges manuell');
+
+  // Footer
+  for(let i=1;i<=doc.getNumberOfPages();i++){
+    doc.setPage(i);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(160,170,185);
+    doc.text(`TipScale · Naesse-Ortung · Seite ${i}/${doc.getNumberOfPages()}`,W/2,290,{align:'center'});
+  }
+
+  const lid=document.getElementById('proj-lid').value||'Messung';
+  doc.save(`Messbericht_${lid.replace(/[^a-zA-Z0-9_-]/g,'_')}_${now.toISOString().slice(0,10)}.pdf`);
+}
+
+function fR4(v){
+  if(v===null||isNaN(v)) return '–';
+  if(v>=1000) return (v/1000).toFixed(3)+'k';
+  if(v>=100) return v.toFixed(2);
+  if(v>=10) return v.toFixed(3);
+  return v.toFixed(4);
+}
+function fL(v){
+  if(v===null||isNaN(v)) return '–';
+  return Math.abs(v)<10?v.toFixed(2):v.toFixed(1);
+}
+
+init();
 </script>
 </body>
 </html>
