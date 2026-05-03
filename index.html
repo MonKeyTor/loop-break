@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#ffffff">
-  <title>Meldeader-Kapazität V1.02</title>
+  <title>Meldeader-Kapazität V1.03</title>
   <style>
     :root {
       --color-bg:            #ffffff;
@@ -167,10 +167,14 @@
 <body>
 <div class="app">
   <div class="hdr">
-    <div><h1>Meldeader-Kapazität V1.02</h1><p>Exzentrische Kapazitätsformel · EN 14419</p><p style="margin-bottom:-6px"><a href="https://github.com/MonkeyTor/loop-break" target="_blank" style="font-size:11px;color:var(--color-text-tertiary);text-decoration:none">github.com/MonkeyTor/loop-break</a></p></div>
+    <div><h1>Meldeader-Kapazität V1.03</h1><p>Exzentrische Kapazitätsformel · EN 14419</p><p style="margin-bottom:-6px"><a href="https://github.com/MonkeyTor/loop-break" target="_blank" style="font-size:11px;color:var(--color-text-tertiary);text-decoration:none">github.com/MonkeyTor/loop-break</a></p></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <button class="gear" onclick="openS()">⚙ Einstellungen</button>
-      <span style="font-size:10px;color:var(--color-text-tertiary);font-family:monospace" id="eps-badge">εᵣ 1.20</span>
+      <div style="display:flex;gap:8px;font-size:10px;color:var(--color-text-tertiary);font-family:monospace">
+        <span id="eps-badge">εᵣ 1.20</span>
+        <span id="kman-badge">Ff 1.00</span>
+        <span id="muffen-badge">M-% 0</span>
+      </div>
     </div>
   </div>
 
@@ -194,13 +198,6 @@
         <label>KMR Außendurchmesser (Premantrohr)</label>
         <select id="kmr-select" onchange="kmrSelected()"><option value="">— KMR ⌀ wählen —</option></select>
       </div>
-    </div>
-
-    <div class="pipe-result-row">
-      <span>Stahlrohr D:</span>
-      <span class="pipe-result-val" id="pipe-active-d">—</span>
-      <span style="margin-left:8px;font-size:11px;color:var(--color-text-tertiary)" id="pipe-active-wall"></span>
-      <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)" id="pipe-active-lbl">kein Typ gewählt</span>
     </div>
   </div>
 
@@ -233,12 +230,12 @@
             <div class="wire-card nicr" id="w-nicr-res" onclick="setWire('nicr-res')">
               <div><span class="wire-tag tag-nicr">Widerstandsdraht NiCr80/20</span></div>
               <div class="wire-name">Fühlerader</div>
-              <div class="wire-spec">0.189 mm² ø 0.490 mm</div>
+              <div class="wire-spec">0.20 mm² ø 0.50 mm</div>
             </div>
             <div class="wire-card curet" id="w-nicr-ret" onclick="setWire('nicr-ret')">
               <div><span class="wire-tag tag-ret">Cu · Rückführer</span></div>
               <div class="wire-name">Rückführader</div>
-              <div class="wire-spec">0.490 mm² ø 0.790 mm</div>
+              <div class="wire-spec">0.50 mm² ø 0.80 mm</div>
             </div>
           </div>
         </div>
@@ -420,12 +417,12 @@
     <div class="f">
       <label>Fühlerader NiCr 80/20 ø (mm)</label>
       <input type="number" id="s-nicr-res-d" step="0.001" min="0.1" inputmode="decimal" oninput="refreshDDisplay()">
-      <div class="hint">Ni 80% · Cr 20% · 0.189 mm²</div>
+      <div class="hint">Ni 80% · Cr 20% · 0.20 mm²</div>
     </div>
     <div class="f">
       <label>Rückführader Cu ø (mm)</label>
       <input type="number" id="s-nicr-ret-d" step="0.001" min="0.1" inputmode="decimal" oninput="refreshDDisplay()">
-      <div class="hint">0.490 mm²</div>
+      <div class="hint">0.50 mm²</div>
     </div>
   </div>
   <div class="slabel" style="margin-top:10px">Brandes · Drahtisolierung</div>
@@ -466,10 +463,17 @@
       <input type="number" id="s-kcal" step="0.001" min="0.8" max="1.2" inputmode="decimal">
     </div>
   </div>
-  <div class="f">
-    <label>Feldfaktor (empirisch)</label>
-    <input type="number" id="s-kman" step="0.001" min="0.5" max="2.0" inputmode="decimal">
-    <div class="hint">1.000 = kein Korrekturbedarf</div>
+  <div class="row">
+    <div class="f">
+      <label>Feldfaktor (empirisch)</label>
+      <input type="number" id="s-kman" step="0.001" min="0.5" max="2.0" inputmode="decimal" oninput="updateBadges()">
+      <div class="hint">1.000 = kein Korrekturbedarf</div>
+    </div>
+    <div class="f">
+      <label>Muffenanteil (%)</label>
+      <input type="number" id="s-muffen" step="1" min="0" max="100" inputmode="numeric" oninput="updateBadges()">
+      <div class="hint">δ fix 19 mm in Muffen. 10 ≈ alle 10 m eine Muffe.</div>
+    </div>
   </div>
   <hr class="divider">
   <div class="slabel">Ausgabe</div>
@@ -529,7 +533,8 @@ const PIPE_TABLE = [
 const DEFAULTS = {
   delta:     19, pipeDN: 48.3, dammIdx: 1,
   eich: 15, eps: 1.2, kcal: 1.000, kman: 1.000,
-  cuBareD: 1.380, cuTinD: 1.380, nicrResD: 0.490, nicrRetD: 0.790,
+  muffen: 0,
+  cuBareD: 1.380, cuTinD: 1.380, nicrResD: 0.50, nicrRetD: 0.80,
   nicrResIsoD: 1.10, nicrResEps: 2.00,
   nicrRetIsoD: 1.40, nicrRetEps: 3.20,
   unit: 'm', sys: 'nordic', wire: 'cu-bare', pipeMode: 'dn',
@@ -541,7 +546,7 @@ function save(key,val){localStorage.setItem(key,String(val));}
 function saveSettings(){
   ['s-eps','s-cu-bare-d','s-cu-tin-d','s-nicr-res-d','s-nicr-ret-d',
    's-nicr-res-iso-d','s-nicr-res-eps','s-nicr-ret-iso-d','s-nicr-ret-eps',
-   's-eich','s-kcal','s-kman','s-unit']
+   's-eich','s-kcal','s-kman','s-muffen','s-unit']
     .forEach(id=>save(id, document.getElementById(id).value));
 }
 function loadSettings(){
@@ -557,6 +562,7 @@ function loadSettings(){
   document.getElementById('s-eich').value       = load('s-eich',       DEFAULTS.eich);
   document.getElementById('s-kcal').value       = load('s-kcal',       DEFAULTS.kcal);
   document.getElementById('s-kman').value       = load('s-kman',       DEFAULTS.kman);
+  document.getElementById('s-muffen').value     = load('s-muffen',     DEFAULTS.muffen);
   document.getElementById('s-unit').value       = load('s-unit',       DEFAULTS.unit);
 }
 
@@ -569,7 +575,7 @@ function loadSettings(){
     o.dataset.dn   = row[0];
     o.dataset.wall = row[2];
     o.dataset.idx  = PIPE_TABLE.indexOf(row);
-    o.textContent  = `DN ${row[0]}  · ø ${row[1]} mm`;
+    o.textContent  = `DN ${row[0]}  · ø ${row[1]} mm  · Wand ${row[2]} mm`;
     sel.appendChild(o);
   });
 })();
@@ -618,9 +624,6 @@ function dnSelected(){
   activePipeD   = row[1];
   save('pipeDN', row[1]);
   save('pipeRowIdx', idx);
-  document.getElementById('pipe-active-d').textContent   = row[1].toFixed(1)+' mm';
-  document.getElementById('pipe-active-wall').textContent= 'Wandstärke '+row[2]+' mm';
-  document.getElementById('pipe-active-lbl').textContent = 'DN '+row[0];
   buildDammCards(row, parseInt(load('dammIdx_'+row[0], 1)));
 }
 
@@ -636,19 +639,12 @@ function kmrSelected(){
   activePipeRow = row;
   activePipeD   = row[1];
   save('pipeKMR', raw);
-  document.getElementById('pipe-active-d').textContent   = row[1].toFixed(1)+' mm';
-  document.getElementById('pipe-active-wall').textContent= 'Wandstärke '+row[2]+' mm';
-  document.getElementById('pipe-active-lbl').textContent = 'DN '+row[0]+' · KMR ⌀'+kmr;
   buildDammCards(row, dammIdx);
 }
 
 function clearPipe(){
   activePipeD=null; activePipeRow=null;
-  document.getElementById('pipe-active-d').textContent   = '—';
-  document.getElementById('pipe-active-wall').textContent= '';
-  document.getElementById('pipe-active-lbl').textContent = 'kein Typ gewählt';
   document.getElementById('damm-section').style.display  = 'none';
-
 }
 
 // ── Dämmstärke cards ──────────────────────────────────────────────────────
@@ -719,10 +715,10 @@ const WIRE_PROFILES={
               isolated:false},
   'cu-tin':  {label:'Nordic Cu/Sn verzinnt',   dKey:'s-cu-tin-d',  dNominal:1.380,
               isolated:false},
-  'nicr-res':{label:'Brandes NiCr 80/20',      dKey:'s-nicr-res-d',dNominal:0.490,
+  'nicr-res':{label:'Brandes NiCr 80/20',      dKey:'s-nicr-res-d',dNominal:0.50,
               isolated:true,  isoKey:'s-nicr-res-iso-d', isoNominal:1.10,
               epsKey:'s-nicr-res-eps',         epsNominal:2.00},
-  'nicr-ret':{label:'Brandes Cu Rückführader', dKey:'s-nicr-ret-d',dNominal:0.790,
+  'nicr-ret':{label:'Brandes Cu Rückführader', dKey:'s-nicr-ret-d',dNominal:0.80,
               isolated:true,  isoKey:'s-nicr-ret-iso-d', isoNominal:1.40,
               epsKey:'s-nicr-ret-eps',         epsNominal:3.20},
   'ka':      {label:'KA · Cu',                 dKey:'s-ka-d',      dNominal:1.200,
@@ -756,6 +752,18 @@ function setEps(v){
 function updateEpsBadge(){
   const v=parseFloat(document.getElementById('s-eps').value)||1.2;
   document.getElementById('eps-badge').textContent='εᵣ '+v.toFixed(2);
+}
+function updateBadges(){
+  // εᵣ
+  updateEpsBadge();
+  // Feldfaktor
+  const kman = parseFloat(document.getElementById('s-kman').value);
+  const kmanVal = isNaN(kman) ? 1.00 : kman;
+  document.getElementById('kman-badge').textContent = 'Ff '+kmanVal.toFixed(2);
+  // Muffenanteil
+  const muffen = parseFloat(document.getElementById('s-muffen').value);
+  const muffenVal = isNaN(muffen) ? 0 : muffen;
+  document.getElementById('muffen-badge').textContent = 'M-% '+muffenVal;
 }
 function updateEpsBtns(){
   const v=parseFloat(document.getElementById('s-eps').value)||1.2;
@@ -824,13 +832,28 @@ function calc(){
   const rI = isolated ? getWireIsoD(activeWire)/2/1000 : rL;
   const epsIso = isolated ? getWireIsoEps(activeWire) : 1.0;
 
-  const C_per_m = calcCperM(R, rL, rI, activeDelta/1000, epsR, epsIso, isolated);
-  if(C_per_m === null){
+  // Strecken-C/m (mit dem aktuellen δ aus Slider/Kartenauswahl)
+  const C_strecke = calcCperM(R, rL, rI, activeDelta/1000, epsR, epsIso, isolated);
+  if(C_strecke === null){
     rlen.innerHTML='<span style="font-size:16px">Geometriefehler</span>';
     ralt.textContent='';
     rdetail.textContent='arcosh-Argument verletzt · δ oder D prüfen';
     return;
   }
+
+  // Muffenkorrektur: in Muffen ist δ fix 19 mm
+  // Gewichteter Mittelwert C/m über Strecke und Muffe
+  const muffenPct = Math.max(0, Math.min(100, parseFloat(document.getElementById('s-muffen').value)||0));
+  let C_per_m = C_strecke;
+  let C_muffe = null;
+  if(muffenPct > 0){
+    C_muffe = calcCperM(R, rL, rI, 0.019, epsR, epsIso, isolated);
+    if(C_muffe !== null){
+      const a = muffenPct/100;
+      C_per_m = (1-a)*C_strecke + a*C_muffe;
+    }
+  }
+
   const L_m=(C_net_pF*1e-12)/C_per_m;
   let disp,altVal;
   if(unit==='km'){disp=(L_m/1000).toFixed(3)+'<span class="runit"> km</span>';altVal='= '+L_m.toFixed(1)+' m';}
@@ -842,10 +865,13 @@ function calc(){
   updateMemo2ResultBox(C_per_m, unit);
   const dammStr = activePipeRow ? `  DS${activeDammIdx+1} · KMR ⌀${activePipeRow[3+activeDammIdx]}` : '';
   const isoStr = isolated ? `  ·  Iso ⌀${(rI*2000).toFixed(2)} mm  εᵣ_iso=${epsIso.toFixed(2)}` : '';
+  const muffenStr = (muffenPct > 0 && C_muffe !== null)
+    ? `\nMuffe ${muffenPct}% · C/m_Strecke=${(C_strecke*1e12).toFixed(3)} · C/m_Muffe=${(C_muffe*1e12).toFixed(3)} pF/m`
+    : '';
   rdetail.textContent=
     prof.label+'  ·  δ='+(activeDelta).toFixed(1)+' mm  ·  εᵣ='+epsR+dammStr+isoStr+(hasMemo1&&hasMemo2?' · Merk1+Merk2 aktiv':hasMemo1?' · Merk1 aktiv':hasMemo2?' · Merk2 aktiv':'')+'\n'+
     'C_netto='+C_net_pF.toFixed(0)+' pF  ·  C/m='+(C_per_m*1e12).toFixed(4)+' pF/m\n'+
-    'R='+(R*1000).toFixed(1)+' mm  rL='+(rL*1000).toFixed(3)+' mm'+(isolated?'  rIso='+(rI*1000).toFixed(3)+' mm':'');
+    'R='+(R*1000).toFixed(1)+' mm  rL='+(rL*1000).toFixed(3)+' mm'+(isolated?'  rIso='+(rI*1000).toFixed(3)+' mm':'')+muffenStr;
   document.getElementById('fbox').textContent=
     'C_netto=('+C_meas+'−'+C_off+')×'+kCal.toFixed(3)+'×'+kMan.toFixed(3)+'='+C_net_pF.toFixed(1)+
     ' pF  ·  C/m='+(C_per_m*1e12).toFixed(4)+' pF/m';
@@ -899,8 +925,18 @@ function calcMemoLength(inclEichwert){
   const isolated = !!prof.isolated;
   const rI = isolated ? getWireIsoD(activeWire)/2/1000 : rL;
   const epsIso = isolated ? getWireIsoEps(activeWire) : 1.0;
-  const C_per_m = calcCperM(R, rL, rI, activeDelta/1000, epsR, epsIso, isolated);
-  if(C_per_m === null) return null;
+  const C_strecke = calcCperM(R, rL, rI, activeDelta/1000, epsR, epsIso, isolated);
+  if(C_strecke === null) return null;
+  // Muffenkorrektur
+  const muffenPct = Math.max(0, Math.min(100, parseFloat(document.getElementById('s-muffen').value)||0));
+  let C_per_m = C_strecke;
+  if(muffenPct > 0){
+    const C_muffe = calcCperM(R, rL, rI, 0.019, epsR, epsIso, isolated);
+    if(C_muffe !== null){
+      const a = muffenPct/100;
+      C_per_m = (1-a)*C_strecke + a*C_muffe;
+    }
+  }
   return (C_net_pF*1e-12)/C_per_m;
 }
 function clearMemo1(){
@@ -965,10 +1001,12 @@ function updateMemo2ResultBox(C_per_m, unit){
 // Benachbart (45°): 2.18mm  Übernächst (90°): 4.03mm  Gegenüber (180°): 5.7mm
 const KA_D_POSITIONS = [2.18, 4.03, 5.7];
 // Solid Cu wire diameters: d = sqrt(4*A/π)
+// d_iso: Aderdurchmesser inkl. SMPE-Isolierung
+// Iso-Wandstärke: 0,40 mm (0,5 mm²) · 0,45 mm (1,0 mm²) · 0,50 mm (1,5 mm²)
 const KA_CS = [
-  {label:'0,5 mm²', A:0.5, d: 0.800},  // Cu/SMPE 4x2x0.8mm: nominal d=0.800mm
-  {label:'1,0 mm²', A:1.0, d: Math.sqrt(4*1.0/Math.PI)},  // 1.128 mm
-  {label:'1,5 mm²', A:1.5, d: Math.sqrt(4*1.5/Math.PI)},  // 1.382 mm
+  {label:'0,5 mm²', A:0.5, d: 0.800,                       d_iso: 1.60},
+  {label:'1,0 mm²', A:1.0, d: Math.sqrt(4*1.0/Math.PI),    d_iso: 2.03},
+  {label:'1,5 mm²', A:1.5, d: Math.sqrt(4*1.5/Math.PI),    d_iso: 2.38},
 ];
 // Screened twisted pair constants for Cu/SMPE/VAS/FOL/AL+PE 4x2x0.8mm
 const KA_SHIELD_D = 7.5;   // shield inner diameter mm (11.5 - 2*1.75 - 2*0.25)
@@ -987,18 +1025,61 @@ function setKaPos(idx){
   calcKaOffset();
 }
 
-// Measured KA cable constants (Cu/SMPE 4x2x0.8mm, netto after eichwert)
-// Measured on 5m sample, eichwert 10pF already subtracted
-const KA_C_PER_M = [43.0, 40.5, 38.0]; // pF/m: Benachbart, Übernächst, Gegenüber (gemessen)
+// Empirisch gemessene Werte bei 0,5 mm² (Cu/SMPE 4x2x0.8mm, 5-m-Probestück, Eichwert abgezogen)
+// Reihenfolge: Benachbart, Übernächst, Gegenüber
+const KA_C_05 = [43.0, 40.5, 38.0]; // pF/m
+
+// Aus den 0,5-mm²-Messwerten wird D pro Position rückgerechnet (einmalig zur Initialisierung).
+// Formel: C/L = π·ε₀·εᵣ / arcosh(D/d)  →  D = d · cosh(π·ε₀·εᵣ / C)
+// Annahme: D bleibt bei größeren Querschnitten gleich (Verseilung im selben Schirm).
+const KA_D_CALIBRATED = (function(){
+  const d_05 = KA_CS[0].d;  // = 0.800 mm
+  return KA_C_05.map(C_pF => {
+    const C = C_pF * 1e-12;
+    const ac = Math.PI * EPS0 * KA_EPS_R / C;
+    return d_05 * Math.cosh(ac);
+  });
+})();
+// Resultat (für Selbst-Doku): KA_D_CALIBRATED ≈ [1.857, 2.019, 2.223] mm
 
 function calcKaOffset(){
   const len = parseFloat(document.getElementById('ka-len').value);
-  if(!len || len<=0){ document.getElementById('ka-offset-pf').textContent='—'; document.getElementById('ka-offset-detail').textContent=''; return; }
-  const C_per_m_pF = KA_C_PER_M[kaPos];
+  if(!len || len<=0){
+    document.getElementById('ka-offset-pf').textContent='—';
+    document.getElementById('ka-offset-detail').textContent='';
+    return;
+  }
+
+  let C_per_m_pF;
+  let modeNote;
+  if(kaCs === 0){
+    // 0,5 mm²: empirischer Messwert direkt verwenden
+    C_per_m_pF = KA_C_05[kaPos];
+    modeNote = 'gemessen';
+  } else {
+    // 1,0 / 1,5 mm²: Modell C — D skaliert mit Iso-Außen-ø
+    // Begründung: Im verseilten Kabel berühren sich die Adern an ihrer Iso-Außenfläche,
+    // nicht am nackten Leiter. Damit bestimmt d_iso den geometrischen Aderabstand.
+    const d_iso_05 = KA_CS[0].d_iso;       // 1,60 mm
+    const d_iso    = KA_CS[kaCs].d_iso;    // 2,10 oder 2,40 mm
+    const d        = KA_CS[kaCs].d;        // Leiterdurchmesser (für arcosh)
+    const scale = d_iso / d_iso_05;
+    const D = KA_D_CALIBRATED[kaPos] * scale;
+    if(D <= d){
+      document.getElementById('ka-offset-pf').textContent='—';
+      document.getElementById('ka-offset-detail').textContent='Querschnitt zu groß für Position';
+      return;
+    }
+    const C_per_m = (Math.PI * EPS0 * KA_EPS_R) / arcosh(D/d);
+    C_per_m_pF = C_per_m * 1e12;
+    modeNote = 'gerechnet';
+  }
+
   const C_total_pF = C_per_m_pF * len;
   const offVal = Math.round(C_total_pF);
   document.getElementById('ka-offset-pf').textContent = offVal;
-  document.getElementById('ka-offset-detail').textContent = '– ' + C_per_m_pF.toFixed(1) + ' pF/m';
+  document.getElementById('ka-offset-detail').textContent =
+    '– ' + C_per_m_pF.toFixed(1) + ' pF/m · ' + modeNote;
   save('ka-len', len);
 }
 
@@ -1023,7 +1104,7 @@ function applyAndClose(){
   saveSettings();
   document.getElementById('c-off').value=document.getElementById('s-eich').value;
   refreshDDisplay();
-  updateEpsBadge();
+  updateBadges();
   updateEpsBtns();
   closeS();
   calc();
@@ -1042,6 +1123,7 @@ function resetS(){
   document.getElementById('s-eich').value       = DEFAULTS.eich;
   document.getElementById('s-kcal').value       = DEFAULTS.kcal;
   document.getElementById('s-kman').value       = DEFAULTS.kman;
+  document.getElementById('s-muffen').value     = DEFAULTS.muffen;
   document.getElementById('s-unit').value       = DEFAULTS.unit;
   refreshDDisplay();
 }
@@ -1050,7 +1132,7 @@ document.getElementById('smod').addEventListener('click',function(e){if(e.target
 // ── Init ──────────────────────────────────────────────────────────────────
 (function init(){
   loadSettings();
-  updateEpsBadge();
+  updateBadges();
   updateEpsBtns();
 
   // Delta (will be overridden by pipe selection if available)
